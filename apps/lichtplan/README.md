@@ -27,7 +27,7 @@ Open `index.html` in een moderne browser (Chrome, Edge, Safari of Firefox). Proj
 |-------|-------|
 | `V` `H` `W` `R` `D` `N` `T` `P` | Selecteren, verschuiven, muur, ruimte, deur, raam, tekst, tekenen |
 | `G` / `S` | Raster / snappen aan of uit |
-| `L` / `C` | Lichtbundels / camerakegel aan of uit |
+| `L` / `C` | Lichtbundels / camerakegels aan of uit (of kies Alles · Licht · Camera · Uit in de werkbalk) |
 | `3` | 3D-camerabeeld aan of uit |
 | `F` | Alles in beeld |
 | `[` / `]` | Selectie 15° draaien |
