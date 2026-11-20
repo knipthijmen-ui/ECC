@@ -1,6 +1,6 @@
-# Lichtplan
+# Aurial
 
-Camera- en lichtplattegronden tekenen in de browser. Eén zelfstandig HTML-bestand, geen build-stap en geen afhankelijkheden.
+Aurial: camera- en lichtplattegronden tekenen in de browser. Eén zelfstandig HTML-bestand, geen build-stap en geen afhankelijkheden.
 
 ## Gebruik
 
