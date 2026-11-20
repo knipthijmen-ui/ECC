@@ -539,6 +539,19 @@ input[type=range].rng.hue { --track: linear-gradient(90deg, #f00, #ff0, #0f0, #0
   .hide-sm { display: none !important; }
   .popup { left: 8px !important; right: 8px; top: auto !important; bottom: 92px; width: auto; max-height: 58vh; }
 }
+/* ---------- sidebar: plain white items, no boxes or glow ---------- */
+.pgroup h4 { color: rgba(255, 255, 255, .55); }
+.pgroup h4::before { display: none; }
+.pitem, .pitem:hover, .pitem.on {
+  background: none; border-color: transparent; box-shadow: none; color: #fff;
+}
+.pitem.on { animation: none; }
+.pitem svg.i, .pitem:hover svg.i, .pitem.on svg.i { color: #fff; filter: none; }
+.pitem { opacity: .78; transition: opacity .15s, transform .15s; }
+.pitem:hover { opacity: 1; transform: translateY(-1px); }
+.pitem.on { opacity: 1; }
+.pitem.on::after { content: ""; position: absolute; bottom: 5px; width: 4px; height: 4px; border-radius: 50%; background: #fff; }
+.pitem .k { color: rgba(255, 255, 255, .4); }
 </style>
 </head>
 <body>
