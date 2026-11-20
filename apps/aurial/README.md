@@ -16,6 +16,8 @@ Open `index.html` in een moderne browser (Chrome, Edge, Safari of Firefox). Proj
 - **Lichtsimulatie**: lampen schijnen met een bundel die je met handvatten groter, kleiner, verder of anders gericht maakt. Spiegels reflecteren de bundel, piepschuim kaatst zacht terug (wit, zilver of goud), diffusie maakt het licht zachter en breder, negatieve fill neemt licht weg, en muren, mensen, tafels en floppy's werpen schaduw.
 - **Camerabeeld**: beeldkegel met handvatten en lenskeuze (16–135 mm full frame).
 - **3D-camerabeeld** rechtsboven: laat in 3D zien wat de gekozen camera ziet: gedetailleerde personen, lampen op statieven met hun koppen, gobo-patronen op de muren, schaduwen en het licht op personen. Spiegels, bounce, diffusie en muren kaatsen licht terug. Sleep het bolletje linksonder om het venster te vergroten of te verkleinen. Gebruikt three.js van cdnjs, dus dit onderdeel heeft internet nodig.
+- **C-stand met arm**: hang een lamp aan een uithouder boven iemand (montage "C-stand + arm"). De voet en armlengte stel je in met het handvat bij de voet; steile kanteling geeft een lichtvlek op de vloer.
+- **Mini-3D in het menu**: bij een lamp of camera zie je bovenin het menu een 3D-weergave met handvatten voor hoogte (paars), draaien/pan (blauwe ring) en kantelen/tilt (gele boog). Sleep de achtergrond om rond te kijken.
 - **Bedienen**: tik een object aan om het te selecteren en te verplaatsen. Houd het ingedrukt (een gloed wordt steeds sterker) om het eigenschappen-menu te openen.
 - **Tekstvakken met verbindingslijnen**: beweeg over een tekstvak, pak het puntje rechtsonder en sleep naar een object. De lijn volgt het object en is aan te passen (kleur, dikte, pijl, kromming, stippel).
 - **Vrij tekenen**, ongedaan maken/opnieuw en PNG-export.

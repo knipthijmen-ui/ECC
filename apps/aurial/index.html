@@ -483,6 +483,13 @@ input[type=range].rng.kel { --track: linear-gradient(90deg, #ff7018, #ff9228, #f
 .gobo-grid button.on { border-color: #fbbf24; color: #fde68a; box-shadow: 0 0 16px rgba(251, 191, 36, .45); }
 input[type=range].rng.hue { --track: linear-gradient(90deg, #f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00); }
 
+/* ---------- mini 3D view in the popup ---------- */
+.mv { position: relative; height: 176px; margin: 2px 0 10px; border-radius: 12px; overflow: hidden; background: #14171d; border: 1px solid rgba(255, 255, 255, .08); box-shadow: inset 0 0 30px rgba(0, 0, 0, .5); }
+.mv.off { display: none; }
+.mv-cv { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; cursor: grab; }
+.mv-hud { position: absolute; left: 8px; top: 8px; z-index: 2; font-size: 11px; font-weight: 700; color: #e9edf5; background: rgba(15, 17, 23, .72); padding: 3px 9px; border-radius: 99px; pointer-events: none; font-variant-numeric: tabular-nums; }
+.mv-tip { position: absolute; left: 8px; right: 8px; bottom: 6px; z-index: 2; font-size: 10px; color: rgba(255, 255, 255, .55); pointer-events: none; }
+
 /* ---------- 3D camera preview ---------- */
 .pv {
   position: absolute; top: 12px; right: 12px; z-index: 6; width: 380px; height: 240px; min-width: 200px; min-height: 140px;
@@ -710,6 +717,7 @@ const I = {
   tablelamp: ic('<path d="M8 3h8l3 8H5z"/><path d="M12 11v8M8 21h8"/>'),
   floorlamp: ic('<path d="M9 2h6l2 6H7z"/><path d="M12 8v13M9 21h6"/>'),
   tube: ic('<rect x="2" y="10" width="20" height="4" rx="2"/><path d="M6 6.5v-2M12 6.5V4M18 6.5v-2" opacity=".6"/>'),
+  cstand: ic('<path d="M4 21l3-4 3 4M7 17V5h12"/><path d="M17 5v3"/><rect x="14.5" y="8" width="5" height="4" rx="1"/>'),
   candle: ic('<path d="M12 3c1.6 2 1.6 3.6 0 5-1.6-1.4-1.6-3 0-5z"/><rect x="9.5" y="9" width="5" height="11" rx="1"/><path d="M7 21h10"/>'),
   negfill: ic('<rect x="4" y="3" width="16" height="18" rx="1.5" fill="currentColor" fill-opacity=".3"/><path d="M8 12h8" stroke-width="2.6"/>'),
   trash: ic('<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>'),
@@ -758,6 +766,7 @@ const LAMP_PRESETS = {
   fresnel: { kind: 'cob', mod: 'fresnel', beam: 30, barndoors: true, doors: 40, range: 850, kelvin: 5600 },
   softbox: { kind: 'cob', mod: 'softbox', beam: 110, range: 450, kelvin: 5600 },
   led: { kind: 'led', beam: 70, range: 500, kelvin: 4300 },
+  boom: { kind: 'cob', mod: 'softbox', grid: true, beam: 100, range: 450, kelvin: 5600, mount: 'cstand', armLen: 130, height: 250, tilt: 70, label: 'Overhead' },
   gobo: { kind: 'gobo', beam: 26, range: 900, kelvin: 4300, intensity: 90, gobo: 'window', focus: 90, label: 'Gobo' },
   bulb: { kind: 'practical', prac: 'bulb', range: 260, kelvin: 2700, intensity: 60, height: 200 },
   tablelamp: { kind: 'practical', prac: 'tablelamp', range: 280, kelvin: 2700, intensity: 55 },
@@ -788,6 +797,7 @@ const PALETTE = [
     { place: 'lamp', preset: LAMP_PRESETS.softbox, label: 'Softbox', icon: I.softbox },
     { place: 'lamp', preset: LAMP_PRESETS.led, label: 'LED-paneel', icon: I.led },
     { place: 'lamp', preset: LAMP_PRESETS.gobo, label: 'Gobo-spot', icon: I.gobo },
+    { place: 'lamp', preset: LAMP_PRESETS.boom, label: 'C-stand + arm', icon: I.cstand },
   ] },
   { title: 'Practicals', color: '#fb923c', items: [
     { place: 'lamp', preset: LAMP_PRESETS.bulb, label: 'Peertje', icon: I.bulb },
@@ -943,6 +953,15 @@ function lampSourceWidth(it) {
 function lampHeight(it) {
   if (it.kind === 'practical') return PRAC_AUTO[it.prac] ? 0 : (it.height || 200);
   return it.height || (it.kind === 'cob' && it.mod === 'softbox' ? 170 : 190);
+}
+function autoTilt(it) {
+  const reach = clamp(it.range * 0.45, 150, 520);
+  return Math.atan2(lampHeight(it) - 140, reach) * R2D;
+}
+const hangs = (it) => it.type === 'lamp' && it.mount === 'cstand' && it.kind !== 'practical';
+function cstandBase(it) {
+  const a = (it.armRot != null ? it.armRot : it.rot) * D2R, L = it.armLen || 120;
+  return { x: it.x - Math.cos(a) * L, y: it.y - Math.sin(a) * L };
 }
 /* Bring lamps from older projects onto the current fixture model. */
 function normalizeLamp(it) {
@@ -1424,12 +1443,19 @@ function computeLight(items) {
     sources.push({ x: it.x, y: it.y, rgb, I: I * (omni ? 0.3 : 0.16), r: Math.min(omni ? 300 : 420, it.range * (omni ? 0.6 : 0.42)) });
     const n = omni ? 180 : clamp(Math.round(beam * 2.2), 28, 220);
     const mask = it.kind === 'gobo' ? goboRowMask(it.gobo || 'window', it.goboRot || 0, it.focus) : null;
+    const tl = !omni && it.tilt != null ? clamp(it.tilt, -30, 90) * D2R : null;
+    const rng = tl != null ? it.range * clamp(Math.cos(tl) * 1.15, 0.12, 1) : it.range;
+    if (tl != null && tl > 0.75) {
+      const hh = lampHeight(it), dfoot = hh / Math.tan(tl), fp2 = fromLocal(it, dfoot, 0);
+      const poolR = Math.max(35, (hh / Math.sin(tl)) * Math.tan((beam * D2R) / 2) * 1.3);
+      sources.push({ x: fp2.x, y: fp2.y, rgb, I: I * 0.6, r: poolR });
+    }
     const A = lampRays(it, beam, n, mask, beam);
-    const pathsA = traceRays(A.rays, segs, it.range + A.back, collector(rgb, I, n));
-    layers.push({ polys: fanPolys(pathsA), rgb, I: I * (omni ? 0.7 : 0.5), range: it.range + A.back });
+    const pathsA = traceRays(A.rays, segs, rng + A.back, collector(rgb, I, n));
+    layers.push({ polys: fanPolys(pathsA), rgb, I: I * (omni ? 0.7 : 0.5), range: rng + A.back });
     if (!omni) {
       const B = lampRays(it, beam * 0.62, Math.max(16, Math.round(n * 0.62)), mask, beam);
-      layers.push({ polys: fanPolys(traceRays(B.rays, segs, it.range * 0.92 + B.back, null)), rgb, I: I * 0.42, range: it.range * 0.92 + B.back });
+      layers.push({ polys: fanPolys(traceRays(B.rays, segs, rng * 0.92 + B.back, null)), rgb, I: I * 0.42, range: rng * 0.92 + B.back });
     }
   }
 
@@ -1961,7 +1987,34 @@ function drawPerson(ctx, it, px) {
   if (it.label) label(ctx, it.label, it.x, it.y + 38 * s, px);
 }
 
+function drawCStand(ctx, it, px) {
+  const b = cstandBase(it), a = Math.atan2(it.y - b.y, it.x - b.x);
+  ctx.save();
+  ctx.lineCap = 'round';
+  shadowOn(ctx, 10, 4, 0.5);
+  ctx.strokeStyle = '#6b7280';
+  ctx.lineWidth = 2.6;
+  ctx.beginPath();
+  for (let k = 0; k < 3; k++) { const la = a + Math.PI + (k - 1) * 0.95; ctx.moveTo(b.x, b.y); ctx.lineTo(b.x + Math.cos(la) * 26, b.y + Math.sin(la) * 26); }
+  ctx.stroke();
+  ctx.save();
+  ctx.translate(b.x + Math.cos(a + Math.PI) * 17, b.y + Math.sin(a + Math.PI) * 17);
+  ctx.rotate(a);
+  ctx.fillStyle = '#8a6a3a';
+  roundRect(ctx, -6, -6, 12, 12, 3); ctx.fill();
+  ctx.restore();
+  ctx.strokeStyle = '#c3cad5';
+  ctx.lineWidth = 3.2;
+  ctx.beginPath(); ctx.moveTo(b.x - Math.cos(a) * 14, b.y - Math.sin(a) * 14); ctx.lineTo(it.x, it.y); ctx.stroke();
+  shadowOff(ctx);
+  ctx.fillStyle = '#2b2d33';
+  ctx.strokeStyle = 'rgba(255,255,255,0.45)';
+  ctx.lineWidth = 1.2;
+  ctx.beginPath(); ctx.arc(b.x, b.y, 5.5, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+  ctx.restore();
+}
 function drawLamp(ctx, it, px) {
+  if (hangs(it)) drawCStand(ctx, it, px);
   const on = it.on && it.intensity > 0;
   const rgb = lampRgb(it), col = on ? rgba(rgb, 1) : '#9ca3af';
   const hot = on ? rgba(rgb.map((v) => lerp(v, 255, 0.55)), 1) : '#cbd5e1';
@@ -2615,10 +2668,11 @@ function handlesOf(it) {
     case 'lamp': case 'camera': {
       const a = it.rot * D2R, R = it.range;
       hs.push({ k: 'tip', x: it.x + Math.cos(a) * R, y: it.y + Math.sin(a) * R, main: true });
-      if (it.type === 'lamp' && lampOmni(it)) break;
+      if (it.type === 'lamp' && lampOmni(it)) { if (hangs(it)) { const b = cstandBase(it); hs.push({ k: 'arm', x: b.x, y: b.y }); } break; }
       const half = (it.type === 'lamp' ? effBeam(it) : it.fov) * D2R / 2;
       hs.push({ k: 'edge', x: it.x + Math.cos(a + half) * R, y: it.y + Math.sin(a + half) * R });
       hs.push({ k: 'edge', x: it.x + Math.cos(a - half) * R, y: it.y + Math.sin(a - half) * R });
+      if (hangs(it)) { const b = cstandBase(it); hs.push({ k: 'arm', x: b.x, y: b.y }); }
       break;
     }
     case 'person': { const p = fromLocal(it, 62 * (it.size || 1), 0); hs.push({ k: 'rot', x: p.x, y: p.y, main: true }); break; }
@@ -2718,7 +2772,7 @@ function drawHandles(it) {
   const px = 1 / ED.view.z;
   const hs = handlesOf(it);
   ctx.save();
-  if ((it.type === 'lamp' || it.type === 'camera') && hs.length === 3) {
+  if ((it.type === 'lamp' || it.type === 'camera') && hs.length >= 3 && hs[1].k === 'edge') {
     const a = it.rot * D2R, half = (it.type === 'lamp' ? effBeam(it) : it.fov) * D2R / 2;
     ctx.strokeStyle = 'rgba(179,168,255,0.75)';
     ctx.lineWidth = 1.4 * px;
@@ -3396,6 +3450,11 @@ function handleDrag(w, shift) {
   const k = drag.h, snap = snapOn();
   switch (it.type) {
     case 'lamp': case 'camera': {
+      if (k === 'arm') {
+        it.armLen = clamp(Math.round(dist(it.x, it.y, w.x, w.y) / 5) * 5, 40, 300);
+        it.armRot = normDeg(Math.round(Math.atan2(it.y - w.y, it.x - w.x) * R2D));
+        break;
+      }
       const a = Math.atan2(w.y - it.y, w.x - it.x) * R2D;
       if (k === 'tip') {
         it.rot = normDeg(snap ? Math.round(a / 5) * 5 : Math.round(a));
@@ -3751,7 +3810,13 @@ function fieldsFor(it) {
       else f.push({ k: 'gel', t: 'gel', l: 'Gel / kleurfilter' });
       if (!lampOmni(it)) f.push({ k: 'beam', t: 'range', l: it.kind === 'cob' && it.mod === 'fresnel' ? 'Spot ↔ flood' : 'Bundelhoek', min: 5, max: 170, step: 1, fmt: (v) => v + '°' });
       f.push({ k: 'range', t: 'range', l: 'Reikwijdte', min: 80, max: 2500, step: 10, fmt: cmFmt });
-      if (!(it.kind === 'practical' && PRAC_AUTO[it.prac])) f.push({ k: 'height', t: 'range', l: it.kind === 'practical' ? 'Hoogte' : 'Hoogte (statief)', min: 30, max: 450, step: 5, fmt: cmFmt, get: lampHeight });
+      if (!(it.kind === 'practical' && PRAC_AUTO[it.prac])) f.push({ k: 'height', t: 'range', l: it.kind === 'practical' ? 'Hoogte' : 'Hoogte', min: 30, max: 450, step: 5, fmt: cmFmt, get: lampHeight });
+      if (!lampOmni(it)) f.push({ k: 'tilt', t: 'range', l: 'Kanteling (omlaag)', min: -30, max: 90, step: 1, fmt: (v) => v + '°', get: (o) => (o.tilt != null ? o.tilt : Math.round(autoTilt(o))) });
+      if (it.kind !== 'practical') {
+        f.push({ k: 'mount', t: 'seg', l: 'Montage', opts: [['stand', 'Statief'], ['cstand', 'C-stand + arm']], get: (o) => o.mount || 'stand',
+          set: (o, v) => { o.mount = v; if (v === 'cstand') { if (!o.armLen) o.armLen = 120; if (o.armRot == null) o.armRot = o.rot; if (lampHeight(o) < 220) o.height = 240; if (o.tilt == null) o.tilt = 55; } } });
+        if (it.mount === 'cstand') f.push({ k: 'armLen', t: 'range', l: 'Armlengte', min: 40, max: 300, step: 5, fmt: cmFmt, get: (o) => o.armLen || 120 });
+      }
       if (!lampOmni(it) || (it.kind === 'practical' && it.prac === 'tube')) f.push(rot);
       return f;
     }
@@ -3760,6 +3825,7 @@ function fieldsFor(it) {
       { k: 'fov', t: 'range', l: 'Beeldhoek', min: 8, max: 120, step: 1, fmt: (v) => `${v}° · ≈${lensFromFov(v)}mm` },
       { k: 'range', t: 'range', l: 'Kijkafstand', min: 100, max: 2500, step: 10, fmt: cmFmt },
       { k: 'height', t: 'range', l: 'Lenshoogte', min: 20, max: 400, step: 5, fmt: cmFmt, get: (o) => o.height || 150 },
+      { k: 'tilt', t: 'range', l: 'Kanteling (omlaag)', min: -45, max: 60, step: 1, fmt: (v) => v + '°', get: (o) => o.tilt || 0 },
       { k: 'showCone', t: 'toggle', l: 'Beeldkegel tonen' },
       sw('color', 'Kleur', CAM_COLORS),
       rot,
@@ -3788,6 +3854,7 @@ function fset(f, it, v) {
   if (it.type === 'stroke') Object.assign(penStyle, { color: it.color, width: it.width, opacity: it.opacity });
   if (it.type === 'wall') Object.assign(wallStyle, { thick: it.thick, color: it.color });
   touch();
+  if (MV.id === it.id) mvQueue();
   commitSoon();
 }
 const pct = (f, v) => ((v - f.min) / (f.max - f.min)) * 100;
@@ -3845,7 +3912,7 @@ function buildPopup(it) {
     `<div class="pp-head"><div class="pp-ic" style="--icg:${TYPE_COLORS[it.type] || ACCENT}99;background:linear-gradient(135deg, ${shade(TYPE_COLORS[it.type] || ACCENT, 0.3)}, ${TYPE_COLORS[it.type] || ACCENT})">${iconFor(it)}</div>` +
     `<div class="pp-title"><small>${esc(TYPE_NAMES[it.type] || it.type)}</small>${hasLabel ? `<input id="ppLabel" value="${esc(it.label)}" placeholder="Naam toevoegen…" spellcheck="false">` : `<div style="font-weight:700;font-size:15px">Eigenschappen</div>`}</div>` +
     `<button class="icon-btn pp-x" id="ppClose" title="Sluiten">${I.close}</button></div>` +
-    `<div class="pp-body">${fields.map((f, i) => fieldHtml(f, it, i)).join('')}</div>` +
+    `<div class="pp-body">${it.type === 'lamp' || it.type === 'camera' ? '<div class="mv" id="mvHost"><div class="mv-hud" id="mvHud"></div><div class="mv-tip">Sleep de bolletjes · sleep de achtergrond om te draaien</div></div>' : ''}${fields.map((f, i) => fieldHtml(f, it, i)).join('')}</div>` +
     `<div class="pp-foot">${it.type !== 'link' ? `<button class="btn" id="ppDup">${I.copy}Dupliceer</button>` : ''}<button class="btn del" id="ppDel">${I.trash}Verwijder</button></div>`;
   $('#ppClose', popup).onclick = closePopup;
   $('#ppDel', popup).onclick = () => deleteItem(it.id);
@@ -3854,6 +3921,7 @@ function buildPopup(it) {
   const lab = $('#ppLabel', popup);
   if (lab) lab.oninput = () => { it.label = lab.value; touch(); commitSoon(); };
   popup.querySelectorAll('.fld').forEach((el) => wireField(el, fields[+el.dataset.i], it));
+  if (it.type === 'lamp' || it.type === 'camera') mvAttach(it);
 }
 function wireField(el, f, it) {
   const vEl = $('.fld-h .v', el);
@@ -4484,11 +4552,15 @@ function sculptHair() {
 }
 
 function pvBuild(items, camIt) {
-  const T = window.THREE;
   if (PV.scene) pvDispose(PV.scene);
+  PV.scene = buildScene3D(items, camIt);
+}
+function buildScene3D(items, camIt, opts) {
+  opts = opts || {};
+  const T = window.THREE;
   const sc = new T.Scene();
-  sc.background = new T.Color('#1b1f27');
-  sc.fog = new T.Fog('#1b1f27', 1800, 5000);
+  sc.background = new T.Color(opts.mini ? '#14171d' : '#1b1f27');
+  if (!opts.mini) sc.fog = new T.Fog('#1b1f27', 1800, 5000);
   const std = (c, o) => new T.MeshStandardMaterial(Object.assign({ color: c, roughness: 0.85, metalness: 0 }, o || {}));
   const glowM = (c) => new T.MeshBasicMaterial({ color: c, toneMapped: false });
   const add = (m, cast, recv, parent) => { m.castShadow = cast !== false; m.receiveShadow = recv !== false; (parent || sc).add(m); return m; };
@@ -4535,7 +4607,9 @@ function pvBuild(items, camIt) {
   };
 
   // ---------- ground, floors, walls ----------
-  const ground = add(new T.Mesh(new T.PlaneGeometry(30000, 30000), std('#4a505c', { roughness: 0.95, map: pvTex('concrete', 256, drawConcrete, 120) })), false, true);
+  const ground = add(opts.mini
+    ? new T.Mesh(new T.CircleGeometry(420, 64), std('#4a505c', { roughness: 0.95, map: pvTex('concrete-mini', 256, drawConcrete, 4) }))
+    : new T.Mesh(new T.PlaneGeometry(30000, 30000), std('#4a505c', { roughness: 0.95, map: pvTex('concrete', 256, drawConcrete, 120) })), false, true);
   ground.rotation.x = -Math.PI / 2;
   const plank = pvTex('planks', 512, drawPlanks);
   plank.repeat.set(1 / 220, 1 / 220);
@@ -4702,7 +4776,8 @@ function pvBuild(items, camIt) {
   }
 
   // ---------- lights ----------
-  sc.add(new T.HemisphereLight('#aeb8cc', '#2a2e36', 0.16));
+  sc.add(new T.HemisphereLight('#aeb8cc', '#2a2e36', opts.mini ? 0.6 : 0.16));
+  if (opts.mini) { const dl = new T.DirectionalLight('#ffffff', 0.85); dl.position.set(260, 520, 340); sc.add(dl); const dl2 = new T.DirectionalLight('#9fb4ff', 0.4); dl2.position.set(-300, 200, -260); sc.add(dl2); }
   let spotShadows = 0, pointShadows = 0;
   const spot = (pos, tgt, rgb, I, angle, pen, range, wantShadow, mapSize, radius) => {
     const s = new T.SpotLight(new T.Color(rgba(rgb, 1)), I, range, clamp(angle, 1.5 * D2R, 85 * D2R), pen, 1);
@@ -4736,18 +4811,38 @@ function pvBuild(items, camIt) {
     const omni = lampOmni(it);
     const h = lampHeight(it);
     const reach = clamp(it.range * 0.45, 150, 520);
-    const tilt = omni ? 0 : Math.atan2(h - 140, reach);
+    const tilt = omni ? 0 : it.tilt != null ? clamp(it.tilt, -30, 90) * D2R : Math.atan2(h - 140, reach);
+    const hang = hangs(it);
     const pan = new T.Group(); pan.position.set(it.x, h, it.y); pan.rotation.y = -a; sc.add(pan);
     const tg = new T.Group(); tg.rotation.z = -tilt; pan.add(tg);
     const yokeR = it.kind === 'led' ? 18 : it.kind === 'gobo' ? 15.5 : 19;
     if (!(it.kind === 'cob' && it.mod === 'lantern')) {
+      const ys = hang ? 1 : -1; // hanging yoke points up to the arm
       for (const z of [-1, 1]) {
-        add(at(box(5, 26, 1.8, metal), 0, -12, z * yokeR), true, true, pan);
+        add(at(box(5, 26, 1.8, metal), 0, ys * 12, z * yokeR), true, true, pan);
         add(at(cyl(3, 3, 3.4, blackM, 16), 0, 0, z * (yokeR + 1.6)), true, true, pan).rotation.x = Math.PI / 2;
       }
-      add(at(box(5, 2.4, yokeR * 2 + 2, metal), 0, -25, 0), true, true, pan);
+      add(at(box(5, 2.4, yokeR * 2 + 2, metal), 0, ys * 25, 0), true, true, pan);
     }
-    stand(it.x, it.y, h - 26);
+    let sbx = it.x - dx * 6, sby = it.y - dy * 6;
+    if (hang) {
+      // C-stand: turtle base, riser, grip head, arm and a sandbag
+      const b = cstandBase(it), top = h + 28, aa = Math.atan2(it.y - b.y, it.x - b.x);
+      sbx = b.x; sby = b.y;
+      for (let k = 0; k < 3; k++) {
+        const la = aa + Math.PI + (k - 1) * 0.95;
+        rod(V3(b.x, 10 + k * 7, b.y), V3(b.x + Math.cos(la) * 58, 1.5, b.y + Math.sin(la) * 58), 1.2, metal);
+        add(at(ball(2, blackM, 10, 8), b.x + Math.cos(la) * 58, 1.8, b.y + Math.sin(la) * 58));
+      }
+      rod(V3(b.x, 6, b.y), V3(b.x, 110, b.y), 2.2, metal);
+      rod(V3(b.x, 105, b.y), V3(b.x, top + 4, b.y), 1.6, alu);
+      add(at(cyl(4.2, 4.2, 7, blackM, 16), b.x, top, b.y)).rotation.x = Math.PI / 2;
+      rod(V3(b.x - Math.cos(aa) * 35, top, b.y - Math.sin(aa) * 35), V3(it.x, top, it.y), 1.3, alu);
+      add(at(ball(3, blackM, 12, 10), it.x, top, it.y));
+      rod(V3(it.x, top, it.y), V3(it.x, h + 25, it.y), 1.4, metal);
+      const bag = add(at(box(28, 9, 15, std('#7a5a2e', { roughness: 1 })), b.x + Math.cos(aa + Math.PI) * 32, 7, b.y + Math.sin(aa + Math.PI) * 32));
+      bag.rotation.y = -aa;
+    } else stand(it.x, it.y, h - 26);
     let F = 0;
     const H = (m, x, y, z, rx, ry, rz) => { m.position.set(x, y, z); if (rx) m.rotation.x = rx; if (ry) m.rotation.y = ry; if (rz) m.rotation.z = rz; return add(m, false, true, tg); };
     if (it.kind === 'led') {
@@ -4819,16 +4914,16 @@ function pvBuild(items, camIt) {
     }
     // control box and cable on the stand
     if (it.kind !== 'led') {
-      add(at(box(9, 20, 15, std('#1f2025', { roughness: 0.5, metalness: 0.3 })), it.x - dx * 6, 100, it.y - dy * 6));
+      add(at(box(9, 20, 15, std('#1f2025', { roughness: 0.5, metalness: 0.3 })), sbx, 100, sby));
       const back = V3(it.x - dx * 20 * Math.cos(tilt), h + 20 * Math.sin(tilt), it.y - dy * 20 * Math.cos(tilt));
-      const curve = new T.CatmullRomCurve3([V3(it.x - dx * 6, 108, it.y - dy * 6), V3(it.x - dx * 26, 130, it.y - dy * 26), V3(back.x - dx * 6, (back.y + 130) / 2, back.z - dy * 6), back]);
+      const curve = new T.CatmullRomCurve3([V3(sbx, 108, sby), V3(lerp(sbx, back.x, 0.3) - dx * 10, 130, lerp(sby, back.z, 0.3) - dy * 10), V3(lerp(sbx, back.x, 0.75), (back.y + 130) / 2, lerp(sby, back.z, 0.75)), back]);
       add(new T.Mesh(new T.TubeGeometry(curve, 24, 0.55, 6), blackM), false, true);
     }
     if (!on) continue;
     const dir3 = V3(Math.cos(a) * Math.cos(tilt), -Math.sin(tilt), Math.sin(a) * Math.cos(tilt));
     const pos = V3(it.x, h, it.y).addScaledVector(dir3, F + 0.5);
     if (omni) { point(pos, rgb, I * 1.7, it.range * 1.4, 1.4, true); continue; }
-    const tgt = V3(it.x + dx * reach, 140, it.y + dy * reach);
+    const tgt = V3(it.x, h, it.y).addScaledVector(dir3, reach / Math.max(0.2, Math.cos(tilt)));
     const beam = effBeam(it);
     const pen = it.kind === 'gobo' ? 0.08 : it.kind === 'led' ? 0.75 : it.mod === 'softbox' ? (it.grid ? 0.7 : 1) : it.mod === 'fresnel' ? 0.3 : 0.45;
     const power = (it.kind === 'gobo' ? 4.2 : it.kind === 'led' ? 2.9 : it.mod === 'softbox' ? 2.6 : it.mod === 'fresnel' ? 3.6 : 3.2) * I;
@@ -4934,7 +5029,7 @@ function pvBuild(items, camIt) {
   for (const c of L('camera')) {
     if (camIt && c.id === camIt.id) continue;
     const ch = c.height || 150, g = new T.Group();
-    g.position.set(c.x, ch, c.y); g.rotation.y = -c.rot * D2R; sc.add(g);
+    g.position.set(c.x, ch, c.y); g.rotation.order = 'YZX'; g.rotation.y = -c.rot * D2R; g.rotation.z = -(c.tilt || 0) * D2R; sc.add(g);
     const bodyM = std('#2a2d33', { roughness: 0.45, metalness: 0.35 });
     const G = (m, x, y, z) => add(at(m, x, y, z), true, true, g);
     G(box(30, 15, 12, bodyM), 0, 0, 0);
@@ -4956,7 +5051,7 @@ function pvBuild(items, camIt) {
       rod(V3(c.x + Math.cos(a) * 14, ch * 0.45, c.y + Math.sin(a) * 14), V3(c.x, ch * 0.42, c.y), 0.6, metal);
     }
   }
-  PV.scene = sc;
+  return sc;
 }
 
 function pvTick() {
@@ -4992,9 +5087,181 @@ function pvTick() {
   PV.cam.updateProjectionMatrix();
   const ch = ci.height || 150, a = ci.rot * D2R;
   PV.cam.position.set(ci.x + Math.cos(a) * 18, ch, ci.y + Math.sin(a) * 18);
-  PV.cam.lookAt(ci.x + Math.cos(a) * 400, ch - (ci.tilt || 0) * 7, ci.y + Math.sin(a) * 400);
+  const ct = (ci.tilt || 0) * D2R;
+  PV.cam.lookAt(ci.x + Math.cos(a) * Math.cos(ct) * 400, ch - Math.sin(ct) * 400, ci.y + Math.sin(a) * Math.cos(ct) * 400);
   PV.renderer.render(PV.scene, PV.cam);
   pvMeta.textContent = `${lensFromFov(ci.fov)}mm · ${fmtM(ch)} hoog`;
+}
+
+/* =====================================================================
+   Mini 3D view inside the properties popup of a lamp or camera, with
+   handles for height (violet), pan (blue ring) and tilt (amber arc).
+   ===================================================================== */
+const MV = { renderer: null, scene: null, cam: null, cv: null, id: null, yaw: 0, drag: null, raf: 0, pick: [] };
+function mvHeight(it) { return it.type === 'camera' ? (it.height || 150) : lampHeight(it); }
+function mvTilt(it) { return it.type === 'camera' ? (it.tilt || 0) : (it.tilt != null ? it.tilt : autoTilt(it)); }
+function mvCanH(it) { return !(it.type === 'lamp' && it.kind === 'practical' && PRAC_AUTO[it.prac]); }
+function mvCanPan(it) { return !(it.type === 'lamp' && it.kind === 'practical' && it.prac !== 'tube'); }
+function mvCanTilt(it) { return !(it.type === 'lamp' && lampOmni(it)); }
+function mvHud(it) {
+  const el = $('#mvHud', popup);
+  if (!el) return;
+  const parts = ['Hoogte ' + fmtM(Math.round(mvHeight(it)))];
+  if (mvCanPan(it)) parts.push('Pan ' + Math.round(normDeg(it.rot)) + '°');
+  if (mvCanTilt(it)) parts.push('Tilt ' + Math.round(mvTilt(it)) + '°');
+  el.textContent = parts.join(' · ');
+}
+function mvAttach(it) {
+  const host = $('#mvHost', popup);
+  if (!host) return;
+  if (!MV.cv) { MV.cv = document.createElement('canvas'); MV.cv.className = 'mv-cv'; mvWire(MV.cv); }
+  host.prepend(MV.cv);
+  if (MV.id !== it.id) { MV.id = it.id; MV.yaw = 0; }
+  mvHud(it);
+  loadThree().then(() => {
+    const T = window.THREE;
+    if (!MV.renderer) {
+      try {
+        MV.renderer = new T.WebGLRenderer({ canvas: MV.cv, antialias: true });
+        MV.renderer.shadowMap.enabled = true;
+        MV.renderer.shadowMap.type = T.PCFShadowMap;
+        MV.renderer.outputEncoding = T.sRGBEncoding;
+        MV.renderer.toneMapping = T.ACESFilmicToneMapping;
+        MV.cam = new T.PerspectiveCamera(38, 1.6, 5, 5000);
+      } catch (_) { host.classList.add('off'); return; }
+    }
+    mvQueue();
+  }).catch(() => host.classList.add('off'));
+}
+function mvQueue() {
+  if (MV.raf || !MV.renderer) return;
+  MV.raf = requestAnimationFrame(() => { MV.raf = 0; mvDraw(); });
+}
+function mvDraw() {
+  const it = byId(MV.id), host = $('#mvHost', popup);
+  if (!it || !host || !MV.cv.isConnected) return;
+  const T = window.THREE;
+  const w = Math.max(10, host.clientWidth), h = Math.max(10, host.clientHeight);
+  MV.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  MV.renderer.setSize(w, h, false);
+  if (MV.scene) pvDispose(MV.scene);
+  const copy = Object.assign(clone(it), { x: 0, y: 0 });
+  const sc = buildScene3D([copy], null, { mini: true });
+  MV.scene = sc;
+  MV.pick = [];
+  const H = mvHeight(it), a = it.rot * D2R, tilt = mvTilt(it) * D2R;
+  const basic = (c) => new T.MeshBasicMaterial({ color: c, toneMapped: false });
+  const grab = (mesh, k) => {
+    sc.add(mesh);
+    mesh.updateMatrixWorld(true);
+    const hit = new T.Mesh(new T.SphereGeometry(15, 10, 8), new T.MeshBasicMaterial({ visible: false }));
+    mesh.getWorldPosition(hit.position);
+    hit.userData.k = k;
+    sc.add(hit);
+    MV.pick.push(hit);
+  };
+  if (mvCanH(it)) {
+    const stem = new T.Mesh(new T.CylinderGeometry(0.7, 0.7, 34, 8), basic('#8b7cff'));
+    stem.position.set(0, H + 26, 0);
+    sc.add(stem);
+    const up = new T.Mesh(new T.ConeGeometry(4.5, 9, 16), basic('#b3a8ff'));
+    up.position.set(0, H + 52, 0);
+    grab(up, 'h');
+  }
+  if (mvCanPan(it)) {
+    const ring = new T.Mesh(new T.TorusGeometry(62, 0.9, 8, 96), basic('#38bdf8'));
+    ring.rotation.x = Math.PI / 2;
+    ring.position.set(0, H, 0);
+    sc.add(ring);
+    const kn = new T.Mesh(new T.SphereGeometry(5.5, 20, 14), basic('#7dd3fc'));
+    kn.position.set(Math.cos(a) * 62, H, Math.sin(a) * 62);
+    grab(kn, 'pan');
+  }
+  if (mvCanTilt(it)) {
+    const g = new T.Group();
+    g.position.set(0, H, 0);
+    g.rotation.y = -a;
+    sc.add(g);
+    const arc = new T.Mesh(new T.TorusGeometry(46, 0.9, 8, 64, Math.PI * 0.75), basic('#fbbf24'));
+    arc.rotation.z = -Math.PI / 2;
+    g.add(arc);
+    const beam = new T.Mesh(new T.CylinderGeometry(0.5, 0.5, 46, 6), basic('#fde68a'));
+    beam.position.set(Math.cos(-tilt) * 23, Math.sin(-tilt) * 23, 0);
+    beam.rotation.z = -tilt - Math.PI / 2;
+    g.add(beam);
+    const kn = new T.Mesh(new T.SphereGeometry(5.5, 20, 14), basic('#fde68a'));
+    kn.position.set(Math.cos(-tilt) * 46, Math.sin(-tilt) * 46, 0);
+    g.add(kn);
+    g.updateMatrixWorld(true);
+    const hit = new T.Mesh(new T.SphereGeometry(15, 10, 8), new T.MeshBasicMaterial({ visible: false }));
+    kn.getWorldPosition(hit.position);
+    hit.userData.k = 'tilt';
+    sc.add(hit);
+    MV.pick.push(hit);
+  }
+  // camera: three-quarter view from the front side, orbit with MV.yaw
+  // frame the head of the lamp / camera with its handles
+  const small = it.type === 'lamp' && it.kind === 'practical' && PRAC_AUTO[it.prac];
+  const cy = small ? 60 : H - 8;
+  const D = small ? 210 : 220;
+  const yaw = a + 2.2 + MV.yaw;
+  MV.cam.aspect = w / h;
+  MV.cam.updateProjectionMatrix();
+  MV.cam.position.set(Math.cos(yaw) * D, cy + 85, Math.sin(yaw) * D);
+  MV.cam.lookAt(0, cy, 0);
+  MV.renderer.render(sc, MV.cam);
+  mvHud(it);
+}
+function mvRay(e) {
+  const T = window.THREE, r = MV.cv.getBoundingClientRect();
+  const ndc = new T.Vector2(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+  const rc = new T.Raycaster();
+  rc.setFromCamera(ndc, MV.cam);
+  return rc;
+}
+function mvWire(cv) {
+  cv.addEventListener('pointerdown', (e) => {
+    if (!MV.renderer || !MV.scene) return;
+    e.stopPropagation();
+    try { cv.setPointerCapture(e.pointerId); } catch (_) { /* ignore */ }
+    const it = byId(MV.id);
+    if (!it) return;
+    const hit = mvRay(e).intersectObjects(MV.pick)[0];
+    MV.drag = hit ? { k: hit.object.userData.k, sx: e.clientX, sy: e.clientY, h0: mvHeight(it) } : { k: 'orbit', sx: e.clientX, yaw0: MV.yaw };
+    cv.style.cursor = 'grabbing';
+  });
+  cv.addEventListener('pointermove', (e) => {
+    const d = MV.drag;
+    if (!MV.renderer || !MV.scene) return;
+    if (!d) { cv.style.cursor = mvRay(e).intersectObjects(MV.pick).length ? 'pointer' : 'grab'; return; }
+    const it = byId(MV.id);
+    if (!it) return;
+    if (d.k === 'orbit') { MV.yaw = d.yaw0 + (e.clientX - d.sx) * 0.012; mvQueue(); return; }
+    const T = window.THREE, H = mvHeight(it), a = it.rot * D2R, rc = mvRay(e), q = new T.Vector3();
+    if (d.k === 'h') {
+      const r = cv.getBoundingClientRect();
+      const dd = MV.cam.position.distanceTo(new T.Vector3(0, H, 0));
+      const wpp = (2 * dd * Math.tan((MV.cam.fov * D2R) / 2)) / r.height;
+      it.height = Math.round(clamp(d.h0 - (e.clientY - d.sy) * wpp, it.type === 'camera' ? 20 : 30, 450) / 5) * 5;
+    } else if (d.k === 'pan') {
+      if (rc.ray.intersectPlane(new T.Plane(new T.Vector3(0, 1, 0), -H), q)) it.rot = normDeg(Math.round((Math.atan2(q.z, q.x) * R2D) / 5) * 5);
+    } else if (d.k === 'tilt') {
+      if (rc.ray.intersectPlane(new T.Plane(new T.Vector3(-Math.sin(a), 0, Math.cos(a)), 0), q)) {
+        const hor = q.x * Math.cos(a) + q.z * Math.sin(a), ver = q.y - H;
+        it.tilt = clamp(Math.round(Math.atan2(-ver, hor) * R2D), it.type === 'camera' ? -45 : -30, 90);
+      }
+    }
+    touch();
+    mvQueue();
+  });
+  const end = () => {
+    const d = MV.drag;
+    MV.drag = null;
+    cv.style.cursor = 'grab';
+    if (d && d.k !== 'orbit') { commit(); refreshPopup(); }
+  };
+  cv.addEventListener('pointerup', end);
+  cv.addEventListener('pointercancel', end);
 }
 
 /* =====================================================================
@@ -5008,6 +5275,7 @@ renderDash();
 requestAnimationFrame(frame);
 Cloud.init(() => { if (!ED.proj) renderDash(); });
 window.__lichtplan = { ED, computeLight, openProject, PV };
+window.__aurialMV = MV;
 })();
 </script>
 </body>
