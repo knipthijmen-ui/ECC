@@ -18,6 +18,7 @@ Open `index.html` in een moderne browser (Chrome, Edge, Safari of Firefox). Proj
 - **Eigenschappen-popup**: klik of houd een object lang ingedrukt.
 - **Tekstvakken met verbindingslijnen**: beweeg over een tekstvak, pak het puntje rechtsonder en sleep naar een object. De lijn volgt het object en is aan te passen (kleur, dikte, pijl, kromming, stippel).
 - **Vrij tekenen**, ongedaan maken/opnieuw en PNG-export.
+- **Subtiele animaties** overal: objecten poppen in en faden uit, lampen ademen, selecties en camerakegels lopen, raster, licht en kegels faden bij aan/uit en zoomen gaat soepel. Staat "minder beweging" aan in je systeem, dan zijn ze uit.
 
 ## Sneltoetsen
 
