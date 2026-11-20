@@ -14,6 +14,7 @@ Open `index.html` in een moderne browser (Chrome, Edge, Safari of Firefox). Proj
 - **Objecten** om in het veld te slepen: persoon (met kijkrichting), tafel, camera, fresnel, LED-paneel, softbox, piepschuim/bounce, spiegel, diffusiescherm en floppy.
 - **Lichtsimulatie**: lampen schijnen met een bundel die je met handvatten groter, kleiner, verder of anders gericht maakt. Spiegels reflecteren de bundel, piepschuim kaatst zacht terug (wit, zilver of goud), diffusie maakt het licht zachter en breder, muren, mensen, tafels en floppy's werpen schaduw.
 - **Camerabeeld**: beeldkegel met handvatten en lenskeuze (16–135 mm full frame).
+- **3D-camerabeeld** rechtsboven: laat in 3D zien wat de gekozen camera ziet, met schaduwen en het licht op personen. Spiegels, bounce, diffusie en muren kaatsen licht terug. Sleep het bolletje linksonder om het venster te vergroten of te verkleinen. Gebruikt three.js van cdnjs, dus dit onderdeel heeft internet nodig.
 - **Eigenschappen-popup**: klik of houd een object lang ingedrukt.
 - **Tekstvakken met verbindingslijnen**: beweeg over een tekstvak, pak het puntje rechtsonder en sleep naar een object. De lijn volgt het object en is aan te passen (kleur, dikte, pijl, kromming, stippel).
 - **Vrij tekenen**, ongedaan maken/opnieuw en PNG-export.
@@ -24,7 +25,8 @@ Open `index.html` in een moderne browser (Chrome, Edge, Safari of Firefox). Proj
 |-------|-------|
 | `V` `H` `W` `R` `D` `N` `T` `P` | Selecteren, verschuiven, muur, ruimte, deur, raam, tekst, tekenen |
 | `G` / `S` | Raster / snappen aan of uit |
-| `L` / `C` | Lichtbundels / camerabeeld aan of uit |
+| `L` / `C` | Lichtbundels / camerakegel aan of uit |
+| `3` | 3D-camerabeeld aan of uit |
 | `F` | Alles in beeld |
 | `[` / `]` | Selectie 15° draaien |
 | Pijltjes (+`Shift`) | Selectie verschuiven (per rasterstap) |

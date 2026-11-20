@@ -403,7 +403,43 @@ input[type=range].rng.kel { --track: linear-gradient(90deg, #ff7018, #ff9228, #f
 .ghost { background: rgba(29, 33, 42, .92); border-color: #9b8cff; box-shadow: 0 16px 40px rgba(0, 0, 0, .5), 0 0 32px rgba(139, 124, 255, .55); }
 .toast { background: linear-gradient(135deg, rgba(36, 40, 52, .95), rgba(26, 30, 39, .95)); border: 1px solid rgba(255, 255, 255, .1); box-shadow: 0 16px 40px rgba(0, 0, 0, .45), 0 0 26px rgba(139, 124, 255, .35); }
 .press circle { stroke: #b3a8ff; filter: drop-shadow(0 0 6px #8b7cff); }
-@media (prefers-reduced-motion: reduce) { .popup, .modal .box, .toast { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .popup, .modal .box, .toast { animation: none; } .pv-dot { animation: none; } }
+
+/* ---------- 3D camera preview ---------- */
+.pv {
+  position: absolute; top: 12px; right: 12px; z-index: 6; width: 380px; height: 240px; min-width: 200px; min-height: 140px;
+  display: flex; flex-direction: column; border-radius: 16px; overflow: hidden; background: #111419;
+  border: 1px solid rgba(255, 255, 255, .1);
+  box-shadow: 0 22px 56px rgba(0, 0, 0, .6), 0 0 0 1px rgba(139, 124, 255, .22), 0 0 40px rgba(139, 124, 255, .25);
+}
+.pv-head {
+  height: 34px; flex: none; display: flex; align-items: center; gap: 8px; padding: 0 12px;
+  background: linear-gradient(180deg, rgba(40, 45, 58, .98), rgba(27, 31, 40, .98)); border-bottom: 1px solid rgba(255, 255, 255, .06); font-size: 12px;
+}
+.pv-dot { width: 8px; height: 8px; border-radius: 50%; background: #ef4444; box-shadow: 0 0 10px #ef4444; animation: rec 1.6s ease-in-out infinite; flex: none; }
+@keyframes rec { 50% { opacity: .3; } }
+.pv select { background: transparent; color: var(--text); border: 0; font: inherit; font-weight: 700; outline: none; cursor: pointer; max-width: 45%; }
+.pv select option { background: #1d212a; color: #e9edf5; }
+.pv-meta { flex: 1; text-align: right; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pv-body { position: relative; flex: 1; min-height: 0; background: #1b1f27; }
+.pv-body canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.pv-frame {
+  position: absolute; inset: 10px; pointer-events: none; opacity: .6;
+  background:
+    linear-gradient(#fff, #fff) left top / 16px 1.5px no-repeat, linear-gradient(#fff, #fff) left top / 1.5px 16px no-repeat,
+    linear-gradient(#fff, #fff) right top / 16px 1.5px no-repeat, linear-gradient(#fff, #fff) right top / 1.5px 16px no-repeat,
+    linear-gradient(#fff, #fff) left bottom / 16px 1.5px no-repeat, linear-gradient(#fff, #fff) left bottom / 1.5px 16px no-repeat,
+    linear-gradient(#fff, #fff) right bottom / 16px 1.5px no-repeat, linear-gradient(#fff, #fff) right bottom / 1.5px 16px no-repeat;
+}
+.pv-msg { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; padding: 18px; color: var(--muted); font-size: 12.5px; }
+.pv-msg[hidden] { display: none; }
+.pv-grip { position: absolute; left: 0; bottom: 0; width: 30px; height: 30px; cursor: nesw-resize; touch-action: none; z-index: 2; }
+.pv-grip::after {
+  content: ""; position: absolute; left: 8px; bottom: 8px; width: 12px; height: 12px; border-radius: 50%;
+  background: #8b7cff; border: 2px solid #fff; box-shadow: 0 0 12px rgba(139, 124, 255, .95); transition: transform .15s;
+}
+.pv-grip:hover::after { transform: scale(1.3); }
+@media (max-width: 760px) { .pv { top: 8px; right: 8px; } }
 
 @media (max-width: 760px) {
   #editor { grid-template-columns: 1fr; grid-template-rows: 54px 1fr 84px; }
@@ -457,7 +493,8 @@ input[type=range].rng.kel { --track: linear-gradient(90deg, #ff7018, #ff9228, #f
       <div class="sep"></div>
       <div class="grp">
         <button class="icon-btn" id="lightBtn" title="Lichtbundels tonen (L)"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></button>
-        <button class="icon-btn" id="coneBtn" title="Camerabeeld tonen (C)"><svg class="i" viewBox="0 0 24 24"><path d="M3 12l18-8v16z"/></svg></button>
+        <button class="icon-btn" id="coneBtn" title="Camerakegel tonen (C)"><svg class="i" viewBox="0 0 24 24"><path d="M3 12l18-8v16z"/></svg></button>
+        <button class="icon-btn" id="pvBtn" title="3D-camerabeeld (3)"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/><path d="M10 8.3v5.4l4.5-2.7z"/></svg></button>
       </div>
       <div class="sep"></div>
       <div class="grp">
@@ -473,6 +510,11 @@ input[type=range].rng.kel { --track: linear-gradient(90deg, #ff7018, #ff9228, #f
     <canvas id="cv"></canvas>
     <div class="hint" id="hint" style="opacity:0"></div>
     <div class="status" id="status"></div>
+    <div class="pv hidden" id="pv">
+      <div class="pv-head"><span class="pv-dot"></span><select id="pvCam" title="Kies camera"></select><span class="pv-meta" id="pvMeta"></span></div>
+      <div class="pv-body"><canvas id="pvCv"></canvas><div class="pv-frame"></div><div class="pv-msg" id="pvMsg"></div></div>
+      <div class="pv-grip" id="pvGrip" title="Sleep om het venster groter of kleiner te maken"></div>
+    </div>
   </div>
 </div>
 
@@ -572,8 +614,8 @@ const TYPE_COLORS = {
 const DEFAULTS = {
   person: { label: 'Talent', color: '#6366f1', size: 1 },
   table: { label: '', shape: 'rect', w: 160, h: 80, color: '#d6b48a' },
-  camera: { label: 'Cam A', color: '#ef4444', fov: 54, range: 500, showCone: true },
-  lamp: { label: 'Key', kind: 'fresnel', on: true, kelvin: 3200, gel: '', intensity: 80, beam: 36, range: 650 },
+  camera: { label: 'Cam A', color: '#ef4444', fov: 54, range: 500, showCone: true, height: 150 },
+  lamp: { label: 'Key', kind: 'fresnel', on: true, kelvin: 3200, gel: '', intensity: 80, beam: 36, range: 650, height: 190 },
   bounce: { label: '', surface: 'white', reflect: 70, w: 100 },
   mirror: { label: '', reflect: 90, w: 80 },
   diffusion: { label: '', strength: 50, w: 120 },
@@ -1093,7 +1135,7 @@ function computeLight(items) {
       const pad = 0.02;
       const u0 = clamp(g.u0 - pad, 0, 1), u1 = clamp(g.u1 + pad, 0, 1);
       const prev = glow[it.id];
-      glow[it.id] = { u0: prev ? Math.min(prev.u0, u0) : u0, u1: prev ? Math.max(prev.u1, u1) : u1, rgb, I: Math.max(prev ? prev.I : 0, I2) };
+      glow[it.id] = { u0: prev ? Math.min(prev.u0, u0) : u0, u1: prev ? Math.max(prev.u1, u1) : u1, rgb, I: Math.max(prev ? prev.I : 0, I2), nx, ny, spread, range: range2 };
       sources.push({ x: s.ax + ex * (u0 + u1) / 2 + nx * 4, y: s.ay + ey * (u0 + u1) / 2 + ny * 4, rgb, I: I2 * 0.55, r: 30 + (u1 - u0) * L * 0.45 });
       const spanLen = (u1 - u0) * L;
       const half = spread * D2R / 2;
@@ -1857,7 +1899,7 @@ function drawScene(ctx, o) {
 /* =====================================================================
    Editor state
    ===================================================================== */
-const DEFAULT_SETTINGS = { grid: true, snap: true, gridSize: 50, light: true, cones: true };
+const DEFAULT_SETTINGS = { grid: true, snap: true, gridSize: 50, light: true, cones: true, preview: true, pvW: 400, pvH: 250 };
 const GRID_SIZES = [10, 25, 50, 100];
 const ED = { proj: null, items: [], settings: clone(DEFAULT_SETTINGS), view: { x: 0, y: 0, z: 1 }, sel: null, hover: null, tool: 'select', place: null, ghost: null, history: [], hIdx: -1, ver: 0 };
 const cv = $('#cv'), stage = $('#stage'), ctx = cv.getContext('2d'), popup = $('#popup'), pressEl = $('#press');
@@ -2434,6 +2476,7 @@ function frame() {
   for (let i = ripples.length - 1; i >= 0; i--) if (now - ripples[i].t0 > ripples[i].dur) ripples.splice(i, 1);
   if (ripples.length) active = true;
   if (!$('#editor').classList.contains('hidden') && (active || needs)) { needs = false; render(); }
+  if (!$('#editor').classList.contains('hidden')) pvTick();
   requestAnimationFrame(frame);
 }
 
@@ -2967,6 +3010,7 @@ window.addEventListener('keydown', (e) => {
   if (K === 'S') { toggleSetting('snap'); return; }
   if (K === 'L') { toggleSetting('light'); return; }
   if (K === 'C') { toggleSetting('cones'); return; }
+  if (K === '3') { setPreview(!ED.settings.preview); scheduleSave(); return; }
   if (K === 'F' || K === '0') { fitView(); return; }
   if (K === '+' || K === '=') { zoomAt(W / 2, H / 2, 1.2); return; }
   if (K === '-') { zoomAt(W / 2, H / 2, 1 / 1.2); }
@@ -3115,12 +3159,14 @@ function fieldsFor(it) {
       { k: 'gel', t: 'gel', l: 'Gel / kleurfilter' },
       { k: 'beam', t: 'range', l: 'Bundelhoek', min: 5, max: 170, step: 1, fmt: (v) => v + '°' },
       { k: 'range', t: 'range', l: 'Reikwijdte', min: 100, max: 2500, step: 10, fmt: cmFmt },
+      { k: 'height', t: 'range', l: 'Hoogte (statief)', min: 30, max: 450, step: 5, fmt: cmFmt, get: (o) => o.height || (o.kind === 'softbox' ? 170 : 190) },
       rot,
     ];
     case 'camera': return [
       { k: 'lens', t: 'seg', l: 'Lens (full frame, mm)', opts: LENSES.map((m) => [m, String(m)]), get: (o) => LENSES.find((m) => fovFromLens(m) === o.fov), set: (o, v) => { o.fov = fovFromLens(v); } },
       { k: 'fov', t: 'range', l: 'Beeldhoek', min: 8, max: 120, step: 1, fmt: (v) => `${v}° · ≈${lensFromFov(v)}mm` },
       { k: 'range', t: 'range', l: 'Kijkafstand', min: 100, max: 2500, step: 10, fmt: cmFmt },
+      { k: 'height', t: 'range', l: 'Lenshoogte', min: 20, max: 400, step: 5, fmt: cmFmt, get: (o) => o.height || 150 },
       { k: 'showCone', t: 'toggle', l: 'Beeldkegel tonen' },
       sw('color', 'Kleur', CAM_COLORS),
       rot,
@@ -3582,6 +3628,8 @@ function openProject(id) {
   setTool('select');
   syncTopbar();
   updateStatus(toWorld({ x: W / 2, y: H / 2 }));
+  PV.camId = null; PV.camSig = '';
+  setPreview(ED.settings.preview !== false);
   ED.ver++;
   needs = true;
   if (!sessionStorageGet('lichtplan.tips')) {
@@ -3605,16 +3653,356 @@ window.addEventListener('pagehide', () => saveNow(true));
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') saveNow(true); });
 
 /* =====================================================================
+   3D camera preview — rebuilds the plan in three.js (loaded on demand)
+   and renders what the chosen camera sees, with real shadows. Light that
+   three.js cannot bounce by itself is approximated from the 2D engine:
+   mirrors get a mirrored virtual spot, bounce/diffusion boards and lit
+   walls become soft secondary lights.
+   ===================================================================== */
+const THREE_URL = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
+const WALL_H = 270;
+const PV = { renderer: null, scene: null, cam: null, loading: null, failed: false, builtVer: -1, lastBuild: 0, camId: null, sizeDirty: true, camSig: '' };
+const pvEl = $('#pv'), pvCv = $('#pvCv'), pvMsg = $('#pvMsg'), pvSel = $('#pvCam'), pvMeta = $('#pvMeta');
+
+function loadThree() {
+  if (window.THREE) return Promise.resolve(window.THREE);
+  if (!PV.loading) {
+    PV.loading = new Promise((res, rej) => {
+      const sc = document.createElement('script');
+      sc.src = THREE_URL;
+      sc.onload = () => (window.THREE ? res(window.THREE) : rej(new Error('no three')));
+      sc.onerror = () => rej(new Error('load failed'));
+      (document.head || document.body).appendChild(sc);
+    });
+  }
+  return PV.loading;
+}
+function pvMessage(t) { pvMsg.textContent = t || ''; pvMsg.hidden = !t; pvCv.style.visibility = t ? 'hidden' : 'visible'; }
+function pvApplySize() {
+  const r = stage.getBoundingClientRect();
+  const w = clamp(ED.settings.pvW || 380, 200, Math.max(200, r.width - 24));
+  const h = clamp(ED.settings.pvH || 240, 140, Math.max(140, r.height - 24));
+  pvEl.style.width = w + 'px';
+  pvEl.style.height = h + 'px';
+  PV.sizeDirty = true;
+}
+function setPreview(on) {
+  ED.settings.preview = on;
+  $('#pvBtn').classList.toggle('on', on);
+  pvEl.classList.toggle('hidden', !on);
+  if (!on) return;
+  pvApplySize();
+  if (PV.renderer) { PV.builtVer = -1; return; }
+  pvMessage('3D-weergave laden…');
+  loadThree().then(() => {
+    try {
+      const T = window.THREE;
+      PV.renderer = new T.WebGLRenderer({ canvas: pvCv, antialias: true, preserveDrawingBuffer: true });
+      PV.renderer.shadowMap.enabled = true;
+      PV.renderer.shadowMap.type = T.PCFSoftShadowMap;
+      PV.renderer.outputEncoding = T.sRGBEncoding;
+      PV.renderer.toneMapping = T.ACESFilmicToneMapping;
+      PV.renderer.toneMappingExposure = 1.05;
+      PV.cam = new T.PerspectiveCamera(50, 1.6, 5, 9000);
+      PV.builtVer = -1;
+      pvMessage('');
+    } catch (_) { PV.failed = true; pvMessage('Deze browser ondersteunt geen 3D (WebGL).'); }
+  }).catch(() => { PV.failed = true; PV.loading = null; pvMessage('De 3D-weergave kon niet laden. Controleer je internetverbinding.'); });
+}
+$('#pvBtn').onclick = () => { setPreview(!ED.settings.preview); scheduleSave(); };
+pvSel.onchange = () => { PV.camId = pvSel.value; PV.builtVer = -1; };
+$('#pvGrip').addEventListener('pointerdown', (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  const g = e.currentTarget;
+  g.setPointerCapture(e.pointerId);
+  const sx = e.clientX, sy = e.clientY, w0 = pvEl.offsetWidth, h0 = pvEl.offsetHeight;
+  g.onpointermove = (ev) => {
+    ED.settings.pvW = Math.round(w0 + (sx - ev.clientX));
+    ED.settings.pvH = Math.round(h0 + (ev.clientY - sy));
+    pvApplySize();
+  };
+  g.onpointerup = g.onpointercancel = () => { g.onpointermove = null; scheduleSave(); };
+});
+
+function pvDispose(sc) {
+  sc.traverse((o) => {
+    if (o.geometry) o.geometry.dispose();
+    if (o.material) (Array.isArray(o.material) ? o.material : [o.material]).forEach((m) => m.dispose());
+    if (o.shadow && o.shadow.map) o.shadow.map.dispose();
+  });
+}
+
+function pvBuild(items, camIt) {
+  const T = window.THREE;
+  if (PV.scene) pvDispose(PV.scene);
+  const sc = new T.Scene();
+  sc.background = new T.Color('#1b1f27');
+  sc.fog = new T.Fog('#1b1f27', 1800, 5000);
+  const std = (c, o) => new T.MeshStandardMaterial(Object.assign({ color: c, roughness: 0.85, metalness: 0 }, o || {}));
+  const add = (m, cast, recv, parent) => { m.castShadow = cast !== false; m.receiveShadow = recv !== false; (parent || sc).add(m); return m; };
+  const box = (w, h, d, mat) => new T.Mesh(new T.BoxGeometry(w, h, d), mat);
+  const cyl = (rt, rb, h, mat, seg) => new T.Mesh(new T.CylinderGeometry(rt, rb, h, seg || 20), mat);
+  const ball = (r, mat) => new T.Mesh(new T.SphereGeometry(r, 24, 16), mat);
+  const by = {};
+  for (const it of items) (by[it.type] = by[it.type] || []).push(it);
+  const L = (t) => by[t] || [];
+  const segs = buildSegs(items);
+  const light = computeLight(items);
+
+  // ground and floors
+  const ground = add(new T.Mesh(new T.PlaneGeometry(30000, 30000), std('#3a404c', { roughness: 0.95 })), false, true);
+  ground.rotation.x = -Math.PI / 2;
+  for (const r of findRooms(L('wall'))) {
+    const shp = new T.Shape(r.pts.map(([x, y]) => new T.Vector2(x, -y)));
+    const m = add(new T.Mesh(new T.ShapeGeometry(shp), std(roomTint(r)[0], { roughness: 0.8 })), false, true);
+    m.rotation.x = -Math.PI / 2;
+    m.position.y = 0.6;
+  }
+
+  // walls with openings
+  const opens = L('door').concat(L('window'));
+  for (const w of L('wall')) {
+    const mat = std(wallColor(w), { roughness: 0.92 });
+    for (const pc of wallPieces(w, opens)) {
+      const h = w.thick / 2;
+      const ax = pc.ax - (pc.e0 ? pc.ex * h : 0), ay = pc.ay - (pc.e0 ? pc.ey * h : 0);
+      const bx = pc.bx + (pc.e1 ? pc.ex * h : 0), by2 = pc.by + (pc.e1 ? pc.ey * h : 0);
+      const len = dist(ax, ay, bx, by2);
+      if (len < 0.5) continue;
+      const m = add(box(len, WALL_H, w.thick, mat));
+      m.position.set((ax + bx) / 2, WALL_H / 2, (ay + by2) / 2);
+      m.rotation.y = -Math.atan2(pc.ey, pc.ex);
+    }
+  }
+  for (const o of opens) {
+    const t = o.thick || 15, rot = -o.rot * D2R;
+    const mat = std('#e9edf5', { roughness: 0.92 });
+    const top = o.type === 'door' ? 210 : 220;
+    const lintel = add(box(o.w, WALL_H - top, t, mat));
+    lintel.position.set(o.x, (WALL_H + top) / 2, o.y);
+    lintel.rotation.y = rot;
+    if (o.type === 'window') {
+      const sill = add(box(o.w, 90, t, mat));
+      sill.position.set(o.x, 45, o.y);
+      sill.rotation.y = rot;
+      const glass = add(new T.Mesh(new T.PlaneGeometry(o.w, 130), std('#a9dcff', { transparent: true, opacity: 0.22, roughness: 0.05, side: T.DoubleSide, emissive: '#3a6f99', emissiveIntensity: 0.25 })), false, false);
+      glass.position.set(o.x, 155, o.y);
+      glass.rotation.y = rot;
+    } else {
+      const sg = o.swap ? -1 : 1, hx = o.flip ? o.w / 2 : -o.w / 2;
+      const c = fromLocal(o, hx, sg * (t / 2 + o.w / 2));
+      const leaf = add(box(o.w, 205, 4, std('#d9dee7', { roughness: 0.6 })));
+      leaf.position.set(c.x, 102.5, c.y);
+      leaf.rotation.y = -(o.rot + 90) * D2R;
+    }
+  }
+
+  // tables
+  for (const it of L('table')) {
+    const g = new T.Group();
+    const wood = std(it.color, { roughness: 0.55 });
+    const top = it.shape === 'round' ? add(cyl(it.w / 2, it.w / 2, 4, wood, 40), true, true, g) : add(box(it.w, 4, it.h, wood), true, true, g);
+    if (it.shape === 'round') top.scale.z = it.h / it.w;
+    top.position.y = 74;
+    const legMat = std(shade(it.color, -0.4), { roughness: 0.5 });
+    const legs = it.shape === 'round' ? [[0, 0]] : [[-1, -1], [1, -1], [1, 1], [-1, 1]].map(([u, v]) => [u * (it.w / 2 - 6), v * (it.h / 2 - 6)]);
+    for (const [lx, lz] of legs) { const l = add(cyl(it.shape === 'round' ? 5 : 2.5, it.shape === 'round' ? 9 : 2.5, 72, legMat), true, true, g); l.position.set(lx, 36, lz); }
+    g.position.set(it.x, 0, it.y);
+    g.rotation.y = -it.rot * D2R;
+    sc.add(g);
+  }
+
+  // people
+  const skin = std('#e7b894', { roughness: 0.55 }), hairM = std('#3b2a1e', { roughness: 0.7 }), pants = std('#2b303b', { roughness: 0.8 });
+  for (const it of L('person')) {
+    const g = new T.Group(), s = it.size || 1;
+    const cloth = std(it.color, { roughness: 0.75 });
+    for (const z of [-9, 9]) { const leg = add(cyl(7, 6, 86, pants), true, true, g); leg.position.set(0, 43, z); }
+    const torso = add(cyl(19, 15, 58, cloth, 28), true, true, g); torso.position.y = 116; torso.scale.x = 0.58;
+    const sh = add(ball(19, cloth), true, true, g); sh.position.y = 142; sh.scale.set(0.58, 0.42, 1.05);
+    for (const z of [-23, 23]) { const arm = add(cyl(5.5, 4.5, 62, cloth), true, true, g); arm.position.set(0, 112, z); const hand = add(ball(4.5, skin), true, true, g); hand.position.set(0, 79, z); }
+    const neck = add(cyl(5.5, 6, 12, skin), true, true, g); neck.position.y = 150;
+    const head = add(ball(11.5, skin), true, true, g); head.position.y = 164; head.scale.set(1.05, 1.18, 0.95);
+    const hair = add(new T.Mesh(new T.SphereGeometry(12.6, 24, 16, Math.PI * 1.5, Math.PI, 0, Math.PI * 0.62), hairM), true, true, g);
+    hair.position.set(-1, 166, 0); hair.scale.set(1.05, 1.15, 0.98);
+    const cap = add(new T.Mesh(new T.SphereGeometry(12.4, 24, 16, 0, Math.PI * 2, 0, Math.PI * 0.32), hairM), true, true, g);
+    cap.position.set(-0.5, 166, 0); cap.scale.set(1.05, 1.15, 0.98);
+    const nose = add(new T.Mesh(new T.ConeGeometry(2.2, 6, 12), skin), true, true, g); nose.rotation.z = -Math.PI / 2; nose.position.set(12.5, 163, 0);
+    const eyeM = std('#1b1b1f', { roughness: 0.3 });
+    for (const z of [-4.2, 4.2]) { const e = add(ball(1.5, eyeM), false, true, g); e.position.set(10.6, 167, z); }
+    g.scale.setScalar(s);
+    g.position.set(it.x, 0, it.y);
+    g.rotation.y = -it.rot * D2R;
+    sc.add(g);
+  }
+
+  // light shaping panels
+  const glow = light.glow || {};
+  for (const it of L('bounce').concat(L('mirror'), L('diffusion'), L('flag'))) {
+    const dims = { bounce: [120, 100], mirror: [90, 110], diffusion: [130, 125], flag: [90, 145] }[it.type];
+    const gl = glow[it.id];
+    let mat;
+    if (it.type === 'bounce') {
+      const c = { white: '#f7f8fa', silver: '#d9e0e8', gold: '#f2c55a' }[it.surface] || '#f7f8fa';
+      mat = std(c, { roughness: it.surface === 'white' ? 0.9 : 0.35, metalness: it.surface === 'white' ? 0 : 0.35 });
+    } else if (it.type === 'mirror') {
+      mat = new T.MeshPhongMaterial({ color: '#cfe0f2', specular: '#ffffff', shininess: 300 });
+    } else if (it.type === 'diffusion') {
+      mat = std('#f5f7fb', { transparent: true, opacity: 0.6, roughness: 1, side: T.DoubleSide });
+    } else {
+      mat = std('#0c0e12', { roughness: 0.95 });
+    }
+    if (gl && it.type !== 'flag' && it.type !== 'mirror') { mat.emissive = new T.Color(rgba(gl.rgb, 1)); mat.emissiveIntensity = clamp(gl.I * 0.5, 0, 0.6); }
+    const m = add(box(it.w, dims[0], it.type === 'flag' ? 2 : 3, mat), it.type !== 'mirror', true);
+    m.position.set(it.x, dims[1], it.y);
+    m.rotation.y = -it.rot * D2R;
+    const standM = std('#3b3f47', { roughness: 0.5, metalness: 0.4 });
+    const st = add(cyl(1.5, 1.5, dims[1] - dims[0] / 2, standM), true, true);
+    st.position.set(it.x, (dims[1] - dims[0] / 2) / 2, it.y);
+  }
+
+  // lights
+  sc.add(new T.HemisphereLight('#aeb8cc', '#2a2e36', 0.13));
+  let shadows = 0;
+  const spot = (x, y, h, tx, ty, th, rgb, I, angle, pen, range, wantShadow) => {
+    const s = new T.SpotLight(new T.Color(rgba(rgb, 1)), I, range, clamp(angle, 2 * D2R, 85 * D2R), pen, 1);
+    s.position.set(x, h, y);
+    s.target.position.set(tx, th, ty);
+    if (wantShadow && shadows < 5) {
+      shadows++;
+      s.castShadow = true;
+      s.shadow.mapSize.set(1024, 1024);
+      s.shadow.camera.near = 10;
+      s.shadow.camera.far = range;
+      s.shadow.bias = -0.0006;
+    }
+    sc.add(s); sc.add(s.target);
+    return s;
+  };
+  const point = (x, y, h, rgb, I, range) => { const p = new T.PointLight(new T.Color(rgba(rgb, 1)), I, range, 1.6); p.position.set(x, h, y); sc.add(p); };
+  for (const it of L('lamp')) {
+    const on = it.on && it.intensity > 0, rgb = lampRgb(it), I = it.intensity / 100;
+    const h = it.height || (it.kind === 'softbox' ? 170 : 190);
+    const a = it.rot * D2R, dx = Math.cos(a), dy = Math.sin(a);
+    const reach = clamp(it.range * 0.45, 150, 520);
+    const tilt = Math.atan2(h - 140, reach);
+    // fixture
+    const g = new T.Group();
+    const dark = std('#24262c', { roughness: 0.5, metalness: 0.3 });
+    const standH = h - 12;
+    const st = add(cyl(1.6, 1.6, standH, dark), true, true); st.position.set(it.x, standH / 2, it.y);
+    for (let k = 0; k < 3; k++) { const leg = add(cyl(1.2, 1.2, 50, dark), true, true); const la = k * 2.094; leg.position.set(it.x + Math.cos(la) * 16, 14, it.y + Math.sin(la) * 16); leg.rotation.set(Math.sin(la) * 0.9, 0, -Math.cos(la) * 0.9); }
+    const sizes = { fresnel: [30, 24, 24], led: [10, 40, 40], softbox: [36, 54, 54] }[it.kind] || [30, 24, 24];
+    add(box(sizes[0], sizes[1], sizes[2], dark), true, true, g);
+    const face = new T.Mesh(new T.PlaneGeometry(sizes[2] * 0.85, sizes[1] * 0.85), new T.MeshBasicMaterial({ color: on ? new T.Color(rgba(rgb.map((v) => lerp(v, 255, 0.6)), 1)) : new T.Color('#555b66') }));
+    face.position.x = sizes[0] / 2 + 0.3;
+    face.rotation.y = Math.PI / 2;
+    g.add(face);
+    g.position.set(it.x, h, it.y);
+    g.rotation.order = 'YZX';
+    g.rotation.y = -a;
+    g.rotation.z = -tilt;
+    sc.add(g);
+    if (!on) continue;
+    const pen = it.kind === 'softbox' ? 1 : it.kind === 'led' ? 0.75 : 0.35;
+    const power = (it.kind === 'softbox' ? 2.6 : it.kind === 'led' ? 2.9 : 3.4) * I;
+    const fx = it.x + dx * sizes[0] / 2, fy = it.y + dy * sizes[0] / 2;
+    spot(fx, fy, h, it.x + dx * reach, it.y + dy * reach, 140, rgb, power, (it.beam / 2) * D2R, pen, it.range * 1.6, true);
+    // mirrors and walls struck by the beam
+    const n = 9, hitsM = new Map();
+    let wallHit = null;
+    for (let j = 0; j < n; j++) {
+      const ang = a + (j / (n - 1) - 0.5) * it.beam * D2R;
+      const hit = castRay(segs, fx, fy, Math.cos(ang), Math.sin(ang), it.range, null);
+      if (!hit) continue;
+      if (hit.s.kind === 'mirror') hitsM.set(hit.s.item, (hitsM.get(hit.s.item) || 0) + 1);
+      if (j === (n - 1) / 2 && (hit.s.kind === 'wall' || hit.s.kind === 'block')) wallHit = hit;
+    }
+    for (const [m, cnt] of hitsM) {
+      const e = panelEnds(m), ex = e[2] - e[0], ey = e[3] - e[1], ln = Math.hypot(ex, ey), nx = -ey / ln, ny = ex / ln;
+      const refl = (px, py) => { const d = (px - e[0]) * nx + (py - e[1]) * ny; return [px - 2 * d * nx, py - 2 * d * ny]; };
+      const [vx, vy] = refl(fx, fy), [tx, ty] = refl(it.x + dx * reach, it.y + dy * reach);
+      spot(vx, vy, h, tx, ty, 140, rgb, power * ((m.reflect || 90) / 100) * (cnt / n), (it.beam / 2) * D2R, pen, it.range * 1.6, false);
+    }
+    if (wallHit) {
+      const t = wallHit.t, k = 1 - t / it.range;
+      const wc = wallHit.s.item.type === 'wall' ? hexToRgb(wallColor(wallHit.s.item)) : [180, 180, 180];
+      const bounceRgb = rgb.map((v, i) => (v * wc[i]) / 255);
+      point(fx + dx * (t - 30), fy + dy * (t - 30), 140, bounceRgb, 0.55 * I * k, 520);
+    }
+  }
+  // soft secondary light from lit bounce boards and diffusion frames
+  for (const it of L('bounce').concat(L('diffusion'))) {
+    const gl = glow[it.id];
+    if (!gl || gl.nx == null) continue;
+    const hgt = it.type === 'bounce' ? 100 : 125;
+    spot(it.x + gl.nx * 6, it.y + gl.ny * 6, hgt, it.x + gl.nx * 200, it.y + gl.ny * 200, 140, gl.rgb, gl.I * (it.type === 'bounce' ? 1.8 : 2.2),
+      clamp(gl.spread / 2, 15, 80) * D2R, 1, (gl.range || 400) * 1.5, it.type === 'diffusion');
+  }
+  // other cameras as small bodies
+  for (const c of L('camera')) {
+    if (camIt && c.id === camIt.id) continue;
+    const g = new T.Group();
+    add(box(30, 20, 18, std(c.color, { roughness: 0.4 })), true, true, g);
+    const lens = add(cyl(6, 6, 14, std('#15171c', { roughness: 0.3 })), true, true, g); lens.rotation.z = Math.PI / 2; lens.position.x = 21;
+    g.position.set(c.x, c.height || 150, c.y);
+    g.rotation.y = -c.rot * D2R;
+    sc.add(g);
+    const st = add(cyl(1.5, 1.5, (c.height || 150) - 10, std('#24262c')), true, true); st.position.set(c.x, ((c.height || 150) - 10) / 2, c.y);
+  }
+  PV.scene = sc;
+}
+
+function pvTick() {
+  if (!ED.settings.preview || !PV.renderer) return;
+  const cams = ED.items.filter((i) => i.type === 'camera');
+  const sig = cams.map((c) => c.id + ':' + c.label).join('|');
+  if (sig !== PV.camSig) {
+    PV.camSig = sig;
+    pvSel.innerHTML = cams.map((c) => `<option value="${esc(c.id)}">${esc(c.label || 'Camera')}</option>`).join('');
+    PV.builtVer = -1;
+  }
+  const sel = byId(ED.sel);
+  if (sel && sel.type === 'camera' && PV.camId !== sel.id) { PV.camId = sel.id; PV.builtVer = -1; }
+  if (!cams.some((c) => c.id === PV.camId)) { PV.camId = cams[0] ? cams[0].id : null; PV.builtVer = -1; }
+  if (PV.camId && pvSel.value !== PV.camId) pvSel.value = PV.camId;
+  const now = performance.now();
+  if (!(PV.builtVer !== ED.ver || anim.size || PV.sizeDirty) || now - PV.lastBuild < 90) return;
+  PV.lastBuild = now;
+  PV.builtVer = ED.ver;
+  PV.sizeDirty = false;
+  const camIt = cams.find((c) => c.id === PV.camId);
+  if (!camIt) { pvMeta.textContent = ''; pvMessage('Plaats een camera om hier het beeld te zien.'); return; }
+  pvMessage('');
+  const items = displayItems();
+  const ci = items.find((i) => i.id === camIt.id) || camIt;
+  pvBuild(items, ci);
+  const body = pvCv.parentElement, w = Math.max(10, body.clientWidth), h = Math.max(10, body.clientHeight);
+  PV.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  PV.renderer.setSize(w, h, false);
+  const asp = w / h, hf = clamp(ci.fov, 4, 150) * D2R;
+  PV.cam.aspect = asp;
+  PV.cam.fov = 2 * Math.atan(Math.tan(hf / 2) / asp) * R2D;
+  PV.cam.updateProjectionMatrix();
+  const ch = ci.height || 150, a = ci.rot * D2R;
+  PV.cam.position.set(ci.x + Math.cos(a) * 18, ch, ci.y + Math.sin(a) * 18);
+  PV.cam.lookAt(ci.x + Math.cos(a) * 400, ch - (ci.tilt || 0) * 7, ci.y + Math.sin(a) * 400);
+  PV.renderer.render(PV.scene, PV.cam);
+  pvMeta.textContent = `${lensFromFov(ci.fov)}mm · ${fmtM(ch)} hoog`;
+}
+
+/* =====================================================================
    Boot
    ===================================================================== */
 buildPalette();
 if ('ResizeObserver' in window) new ResizeObserver(() => { if (ED.proj) resize(); }).observe(stage);
-window.addEventListener('resize', () => { if (ED.proj) { resize(); if (popupFor) positionPopup(byId(popupFor)); } });
+window.addEventListener('resize', () => { if (ED.proj) { resize(); if (ED.settings.preview) pvApplySize(); if (popupFor) positionPopup(byId(popupFor)); } });
 if (!loadProjects().length) createProject('Voorbeeld: interview', tplInterview(), false);
 renderDash();
 requestAnimationFrame(frame);
 Cloud.init(() => { if (!ED.proj) renderDash(); });
-window.__lichtplan = { ED, computeLight, openProject };
+window.__lichtplan = { ED, computeLight, openProject, PV };
 })();
 </script>
 </body>
