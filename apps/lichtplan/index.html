@@ -452,6 +452,37 @@ input[type=range].rng.kel { --track: linear-gradient(90deg, #ff7018, #ff9228, #f
 .tpl .ic { transition: transform .3s cubic-bezier(.3, 1.6, .5, 1); }
 .tpl:hover .ic { transform: rotate(-6deg) scale(1.08); }
 
+/* ---------- press-and-hold, gobo picker, RGB ---------- */
+@property --pp { syntax: '<percentage>'; inherits: false; initial-value: 0%; }
+.press { position: fixed; z-index: 150; width: 84px; height: 84px; margin: -42px 0 0 -42px; pointer-events: none; }
+.press-ring {
+  position: absolute; inset: 0; border-radius: 50%; --pp: 0%;
+  background: conic-gradient(from -90deg, #8b7cff 0%, #f472b6 calc(var(--pp) * .6), #fde68a var(--pp), rgba(255, 255, 255, .1) var(--pp));
+  -webkit-mask: radial-gradient(circle, transparent 31px, #000 32px, #000 38px, transparent 39px);
+  mask: radial-gradient(circle, transparent 31px, #000 32px, #000 38px, transparent 39px);
+  filter: drop-shadow(0 0 6px rgba(244, 114, 182, .8));
+}
+.press-glow {
+  position: absolute; inset: -28px; border-radius: 50%; opacity: 0; transform: scale(.4);
+  background: radial-gradient(circle, rgba(253, 230, 138, .6), rgba(244, 114, 182, .45) 30%, rgba(139, 124, 255, .3) 55%, transparent 72%);
+}
+.press.run .press-ring { animation: pressfill .6s .08s linear forwards; }
+.press.run .press-glow { animation: pressglow .6s .08s ease-in forwards; }
+.press.done { animation: pressburst .32s ease-out forwards; }
+@keyframes pressfill { to { --pp: 100%; } }
+@keyframes pressglow { to { opacity: 1; transform: scale(1.12); } }
+@keyframes pressburst { to { opacity: 0; transform: scale(1.7); } }
+.gobo-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.gobo-grid button {
+  border: 1px solid rgba(255, 255, 255, .08); background: rgba(255, 255, 255, .04); border-radius: 10px; padding: 5px 2px 4px;
+  cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 10px; font-weight: 700; color: var(--muted);
+  transition: transform .15s, box-shadow .2s, border-color .2s;
+}
+.gobo-grid img { width: 38px; height: 38px; border-radius: 50%; display: block; }
+.gobo-grid button:hover { transform: translateY(-1px); border-color: rgba(251, 191, 36, .5); }
+.gobo-grid button.on { border-color: #fbbf24; color: #fde68a; box-shadow: 0 0 16px rgba(251, 191, 36, .45); }
+input[type=range].rng.hue { --track: linear-gradient(90deg, #f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00); }
+
 /* ---------- 3D camera preview ---------- */
 .pv {
   position: absolute; top: 12px; right: 12px; z-index: 6; width: 380px; height: 240px; min-width: 200px; min-height: 140px;
@@ -572,7 +603,7 @@ input[type=range].rng.kel { --track: linear-gradient(90deg, #ff7018, #ff9228, #f
 
 <div id="popup" class="popup hidden"></div>
 <div id="modal" class="modal hidden"></div>
-<svg class="press hidden" id="press" viewBox="0 0 54 54"><circle cx="27" cy="27" r="23"/></svg>
+<div class="press hidden" id="press"><div class="press-glow"></div><div class="press-ring"></div></div>
 <input type="file" id="fileIn" accept=".json,application/json" hidden>
 
 <script>
@@ -639,6 +670,14 @@ const I = {
   flag: ic('<rect x="3" y="10" width="18" height="4" rx="1" fill="currentColor"/><path d="M8 4v4M12 4v4M16 4v4" opacity=".4"/>'),
   link: ic('<path d="M4 18c6 0 10-6 16-12"/><path d="M15 6h5v5"/>'),
   stroke: ic('<path d="M3 17c3-6 5-8 7-5s4 2 6-1 3-4 5-2"/>'),
+  cob: ic('<rect x="3" y="8" width="9" height="8" rx="2"/><path d="M12 9.5l7-3.5v12l-7-3.5"/><path d="M5 8V6M8 8V6M5 18v-2M8 18v-2"/>'),
+  gobo: ic('<rect x="2" y="9" width="8" height="6" rx="2"/><path d="M10 10h5v4h-5M15 10.5h3v3h-3"/><circle cx="21" cy="12" r="1.2" fill="currentColor"/>'),
+  bulb: ic('<path d="M12 2v3"/><path d="M8.6 14.5a5 5 0 116.8 0c-.6.6-1 1.3-1 2.1V17h-4.8v-.4c0-.8-.4-1.5-1-2.1z"/><path d="M10 20h4"/>'),
+  tablelamp: ic('<path d="M8 3h8l3 8H5z"/><path d="M12 11v8M8 21h8"/>'),
+  floorlamp: ic('<path d="M9 2h6l2 6H7z"/><path d="M12 8v13M9 21h6"/>'),
+  tube: ic('<rect x="2" y="10" width="20" height="4" rx="2"/><path d="M6 6.5v-2M12 6.5V4M18 6.5v-2" opacity=".6"/>'),
+  candle: ic('<path d="M12 3c1.6 2 1.6 3.6 0 5-1.6-1.4-1.6-3 0-5z"/><rect x="9.5" y="9" width="5" height="11" rx="1"/><path d="M7 21h10"/>'),
+  negfill: ic('<rect x="4" y="3" width="16" height="18" rx="1.5" fill="currentColor" fill-opacity=".3"/><path d="M8 12h8" stroke-width="2.6"/>'),
   trash: ic('<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>'),
   copy: ic('<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 00-2-2H6a2 2 0 00-2 2v8a2 2 0 002 2h2"/>'),
   edit: ic('<path d="M4 20h4L19 9l-4-4L4 16z"/>'),
@@ -656,22 +695,23 @@ const I = {
 const TYPE_NAMES = {
   person: 'Persoon', table: 'Tafel', camera: 'Camera', lamp: 'Lamp', bounce: 'Piepschuim / bounce',
   mirror: 'Spiegel', diffusion: 'Diffusiescherm', flag: 'Floppy (zwart)', door: 'Deur', window: 'Raam',
-  text: 'Tekstvak', wall: 'Muur', link: 'Verbindingslijn', stroke: 'Tekening',
+  text: 'Tekstvak', wall: 'Muur', link: 'Verbindingslijn', stroke: 'Tekening', negfill: 'Negatieve fill',
 };
 const TYPE_COLORS = {
   person: '#6366f1', table: '#b8875a', camera: '#ef4444', lamp: '#f59e0b', bounce: '#64748b', mirror: '#0ea5e9',
   diffusion: '#94a3b8', flag: '#111827', door: '#7c3aed', window: '#0284c7', text: '#eab308', wall: '#94a3b8',
-  link: '#111827', stroke: '#e11d48',
+  link: '#111827', stroke: '#e11d48', negfill: '#475569',
 };
 const DEFAULTS = {
-  person: { label: 'Talent', color: '#6366f1', size: 1 },
+  person: { label: 'Talent', color: '#6366f1', size: 1, skin: '#e0ac8a', hair: '#3b2a1e', pants: '#2b303b' },
   table: { label: '', shape: 'rect', w: 160, h: 80, color: '#d6b48a' },
   camera: { label: 'Cam A', color: '#ef4444', fov: 54, range: 500, showCone: true, height: 150 },
-  lamp: { label: 'Key', kind: 'fresnel', on: true, kelvin: 3200, gel: '', intensity: 80, beam: 36, range: 650, height: 190 },
+  lamp: { label: 'Key', kind: 'cob', mod: 'reflector', barndoors: false, doors: 45, grid: false, on: true, cmode: 'cct', kelvin: 5600, gel: '', hue: 210, sat: 100, intensity: 80, beam: 55, range: 700, height: 190, gobo: 'window', goboRot: 0, prac: 'bulb' },
   bounce: { label: '', surface: 'white', reflect: 70, w: 100 },
   mirror: { label: '', reflect: 90, w: 80 },
   diffusion: { label: '', strength: 50, w: 120 },
   flag: { label: '', w: 100 },
+  negfill: { label: 'Neg. fill', w: 150, strength: 60 },
   door: { w: 90, flip: false, swap: false, thick: 15 },
   window: { w: 120, thick: 15 },
   text: { text: 'Tekst', size: 18, color: '#111827', bg: '#fff4bf', bold: false },
@@ -680,9 +720,16 @@ const DEFAULTS = {
   stroke: { color: '#f472b6', width: 3, opacity: 1 },
 };
 const LAMP_PRESETS = {
-  fresnel: { kind: 'fresnel', beam: 36, range: 650 },
-  led: { kind: 'led', beam: 70, range: 500, kelvin: 5600 },
-  softbox: { kind: 'softbox', beam: 100, range: 420 },
+  cob: { kind: 'cob', mod: 'reflector', beam: 55, range: 700, kelvin: 5600 },
+  fresnel: { kind: 'cob', mod: 'fresnel', beam: 30, barndoors: true, doors: 40, range: 850, kelvin: 5600 },
+  softbox: { kind: 'cob', mod: 'softbox', beam: 110, range: 450, kelvin: 5600 },
+  led: { kind: 'led', beam: 70, range: 500, kelvin: 4300 },
+  gobo: { kind: 'gobo', beam: 26, range: 900, kelvin: 4300, intensity: 90, gobo: 'window', label: 'Gobo' },
+  bulb: { kind: 'practical', prac: 'bulb', range: 260, kelvin: 2700, intensity: 60, height: 200 },
+  tablelamp: { kind: 'practical', prac: 'tablelamp', range: 280, kelvin: 2700, intensity: 55 },
+  floorlamp: { kind: 'practical', prac: 'floorlamp', range: 340, kelvin: 2900, intensity: 65 },
+  tube: { kind: 'practical', prac: 'tube', range: 320, kelvin: 4000, intensity: 60, height: 220 },
+  candle: { kind: 'practical', prac: 'candle', range: 150, kelvin: 1900, intensity: 45 },
 };
 
 const PALETTE = [
@@ -702,15 +749,25 @@ const PALETTE = [
     { place: 'camera', label: 'Camera', icon: I.camera },
   ] },
   { title: 'Lampen', color: '#fbbf24', items: [
+    { place: 'lamp', preset: LAMP_PRESETS.cob, label: 'COB-lamp', icon: I.cob },
     { place: 'lamp', preset: LAMP_PRESETS.fresnel, label: 'Fresnel', icon: I.fresnel },
-    { place: 'lamp', preset: LAMP_PRESETS.led, label: 'LED-paneel', icon: I.led },
     { place: 'lamp', preset: LAMP_PRESETS.softbox, label: 'Softbox', icon: I.softbox },
+    { place: 'lamp', preset: LAMP_PRESETS.led, label: 'LED-paneel', icon: I.led },
+    { place: 'lamp', preset: LAMP_PRESETS.gobo, label: 'Gobo-spot', icon: I.gobo },
+  ] },
+  { title: 'Practicals', color: '#fb923c', items: [
+    { place: 'lamp', preset: LAMP_PRESETS.bulb, label: 'Peertje', icon: I.bulb },
+    { place: 'lamp', preset: LAMP_PRESETS.tablelamp, label: 'Schemerlamp', icon: I.tablelamp },
+    { place: 'lamp', preset: LAMP_PRESETS.floorlamp, label: 'Staande lamp', icon: I.floorlamp },
+    { place: 'lamp', preset: LAMP_PRESETS.tube, label: 'TL-buis', icon: I.tube },
+    { place: 'lamp', preset: LAMP_PRESETS.candle, label: 'Kaars', icon: I.candle },
   ] },
   { title: 'Licht vormen', color: '#2dd4bf', items: [
     { place: 'bounce', label: 'Piepschuim', icon: I.bounce },
     { place: 'mirror', label: 'Spiegel', icon: I.mirror },
     { place: 'diffusion', label: 'Diffusie', icon: I.diffusion },
     { place: 'flag', label: 'Floppy', icon: I.flag },
+    { place: 'negfill', label: 'Neg. fill', icon: I.negfill },
   ] },
 ];
 
@@ -819,7 +876,129 @@ const GELS = [
   ['', 'Geen'], ['#ff9d3c', 'CTO'], ['#5fa3ff', 'CTB'], ['#ff3b3b', 'Rood'], ['#ff4fd8', 'Magenta'],
   ['#9b5cff', 'Paars'], ['#2f5bff', 'Blauw'], ['#22d3ee', 'Cyaan'], ['#3ddc84', 'Groen'],
 ];
-const lampRgb = (it) => (it.gel ? hexToRgb(it.gel) : kelvinRgb(it.kelvin));
+function lampRgb(it) {
+  const m = it.cmode || (it.gel ? 'gel' : 'cct');
+  if (m === 'rgb') { const sat = (it.sat == null ? 100 : it.sat) / 100; return hslRgb(it.hue || 0, sat, 0.5 + 0.25 * (1 - sat)); }
+  if (m === 'gel' && it.gel) return hexToRgb(it.gel);
+  return kelvinRgb(it.kelvin);
+}
+/* =====================================================================
+   Fixtures: COB with interchangeable heads, LED panel, gobo projector
+   and practicals. Colour can be CCT (kelvin), RGB (hue/sat) or a gel.
+   ===================================================================== */
+const PRAC_AUTO = { tablelamp: 1, floorlamp: 1, candle: 1 };
+const lampOmni = (it) => it.kind === 'practical' || (it.kind === 'cob' && it.mod === 'lantern');
+function effBeam(it) {
+  if (lampOmni(it)) return 360;
+  let b = it.beam;
+  if (it.kind === 'cob' && it.mod === 'softbox' && it.grid) b = Math.min(b, 45);
+  if (it.kind === 'cob' && it.barndoors && (it.mod === 'reflector' || it.mod === 'fresnel')) b = Math.min(b, it.doors || 45);
+  return b;
+}
+function lampFront(it) {
+  if (lampOmni(it)) return 0;
+  if (it.kind === 'led') return 8;
+  if (it.kind === 'gobo') return 36;
+  return { reflector: 26, fresnel: 29, softbox: 48 }[it.mod] || 26;
+}
+function lampSourceWidth(it) {
+  if (it.kind === 'led') return 36;
+  if (it.kind === 'cob' && it.mod === 'softbox') return 70;
+  return 0;
+}
+function lampHeight(it) {
+  if (it.kind === 'practical') return PRAC_AUTO[it.prac] ? 0 : (it.height || 200);
+  return it.height || (it.kind === 'cob' && it.mod === 'softbox' ? 170 : 190);
+}
+/* Bring lamps from older projects onto the current fixture model. */
+function normalizeLamp(it) {
+  if (it.type !== 'lamp') return it;
+  if (it.kind === 'fresnel') { it.kind = 'cob'; it.mod = 'fresnel'; it.barndoors = true; it.doors = Math.max(it.beam || 36, 30); }
+  else if (it.kind === 'softbox') { it.kind = 'cob'; it.mod = 'softbox'; if (it.beam < 90) it.beam = 100; }
+  if (!it.kind) it.kind = 'cob';
+  if (it.kind === 'cob' && !it.mod) it.mod = 'reflector';
+  if (!it.cmode) it.cmode = it.gel ? 'gel' : 'cct';
+  return it;
+}
+function hslRgb(h, s, l) {
+  const k = (n) => (n + h / 30) % 12, a = s * Math.min(l, 1 - l);
+  const f = (n) => l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+  return [Math.round(f(0) * 255), Math.round(f(8) * 255), Math.round(f(4) * 255)];
+}
+
+/* ---------- gobos ---------- */
+const GOBOS = [['window', 'Raam'], ['blinds', 'Jaloezie'], ['leaves', 'Bladeren'], ['bars', 'Tralies'], ['dots', 'Stippen'], ['star', 'Ster'], ['arch', 'Kerkraam'], ['circle', 'Cirkel']];
+function mulberry(a) { return () => { a |= 0; a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+/* Draws the open (light-passing) parts of a gobo into a size×size square. */
+function goboHoles(c, S, key) {
+  const m = S / 2;
+  c.beginPath();
+  switch (key) {
+    case 'window': {
+      const a = S * 0.2, b = S * 0.8, g = S * 0.035;
+      for (const [x0, x1] of [[a, m - g], [m + g, b]]) for (const [y0, y1] of [[a, m - g], [m + g, b]]) c.rect(x0, y0, x1 - x0, y1 - y0);
+      break;
+    }
+    case 'blinds': for (let i = 0; i < 8; i++) c.rect(S * 0.14, S * (0.16 + i * 0.09), S * 0.72, S * 0.05); break;
+    case 'bars': for (let i = 0; i < 6; i++) c.rect(S * (0.17 + i * 0.115), S * 0.12, S * 0.06, S * 0.76); break;
+    case 'dots': for (let i = 0; i < 5; i++) for (let j = 0; j < 5; j++) { const x = S * (0.22 + i * 0.14), y = S * (0.22 + j * 0.14); c.moveTo(x + S * 0.04, y); c.arc(x, y, S * 0.04, 0, Math.PI * 2); } break;
+    case 'star': for (let i = 0; i < 10; i++) { const r = i % 2 ? S * 0.16 : S * 0.38, a = -Math.PI / 2 + i * Math.PI / 5; const x = m + Math.cos(a) * r, y = m + Math.sin(a) * r; if (i) c.lineTo(x, y); else c.moveTo(x, y); } c.closePath(); break;
+    case 'arch': for (const cx of [m - S * 0.16, m + S * 0.16]) { const w = S * 0.11; c.moveTo(cx - w, S * 0.8); c.lineTo(cx - w, S * 0.42); c.arc(cx, S * 0.42, w, Math.PI, 0); c.lineTo(cx + w, S * 0.8); c.closePath(); } break;
+    case 'circle': c.arc(m, m, S * 0.3, 0, Math.PI * 2); break;
+    default: { // leaves / breakup
+      const rnd = mulberry(11);
+      for (let i = 0; i < 34; i++) {
+        const x = S * (0.12 + rnd() * 0.76), y = S * (0.12 + rnd() * 0.76), rx = S * (0.025 + rnd() * 0.05), ry = rx * (0.4 + rnd() * 0.5), r = rnd() * Math.PI;
+        c.moveTo(x + Math.cos(r) * rx, y + Math.sin(r) * rx);
+        c.ellipse(x, y, rx, ry, r, 0, Math.PI * 2);
+      }
+    }
+  }
+  c.fill();
+}
+const goboCache = new Map();
+/* mode 'alpha': white = metal (blocks), black = holes. mode 'thumb': UI preview. */
+function goboCanvas(key, S, mode, rotDeg) {
+  const ck = key + '|' + S + '|' + mode + '|' + (rotDeg || 0);
+  if (goboCache.has(ck)) return goboCache.get(ck);
+  const cv2 = document.createElement('canvas');
+  cv2.width = cv2.height = S;
+  const c = cv2.getContext('2d');
+  c.fillStyle = mode === 'alpha' ? '#fff' : '#17191f';
+  c.fillRect(0, 0, S, S);
+  c.save();
+  c.beginPath(); c.arc(S / 2, S / 2, S * 0.47, 0, Math.PI * 2); c.clip();
+  c.translate(S / 2, S / 2); c.rotate((rotDeg || 0) * D2R); c.translate(-S / 2, -S / 2);
+  if (mode === 'alpha') c.fillStyle = '#000';
+  else { const g = c.createRadialGradient(S / 2, S / 2, 0, S / 2, S / 2, S / 2); g.addColorStop(0, '#fff6d6'); g.addColorStop(1, '#fbbf24'); c.fillStyle = g; }
+  goboHoles(c, S, key);
+  c.restore();
+  if (mode !== 'alpha') { c.strokeStyle = '#5b5f69'; c.lineWidth = S * 0.04; c.beginPath(); c.arc(S / 2, S / 2, S * 0.47, 0, Math.PI * 2); c.stroke(); }
+  if (goboCache.size > 80) goboCache.clear();
+  goboCache.set(ck, cv2);
+  return cv2;
+}
+const goboThumbs = {};
+const goboThumb = (k) => goboThumbs[k] || (goboThumbs[k] = goboCanvas(k, 76, 'thumb', 0).toDataURL());
+/* Which part of the beam the gobo lets through along its horizontal centre line. */
+const maskCache = new Map();
+function goboRowMask(key, rotDeg) {
+  const ck = key + '|' + rotDeg;
+  let row = maskCache.get(ck);
+  if (!row) {
+    // fraction of each column that lets light through, normalised to the most open column
+    const c = goboCanvas(key, 64, 'alpha', rotDeg).getContext('2d');
+    const d = c.getImageData(0, 0, 64, 64).data;
+    row = [];
+    for (let x = 0; x < 64; x++) { let open = 0; for (let y = 0; y < 64; y++) if (d[(y * 64 + x) * 4] < 128) open++; row.push(open); }
+    const mx = Math.max(1, ...row);
+    row = row.map((v) => (v / mx < 0.06 ? 0 : Math.min(1, (v / mx) * 1.15)));
+    maskCache.set(ck, row);
+  }
+  return (af) => row[clamp(Math.floor((af + 0.5) * 64), 0, 63)];
+}
+
+
 
 /* =====================================================================
    Geometry helpers
@@ -862,9 +1041,21 @@ function obox(it) {
   switch (it.type) {
     case 'person': { const s = it.size || 1; return { cx: it.x, cy: it.y, rot: it.rot, hw: 16 * s, hh: 28 * s }; }
     case 'table': return { cx: it.x, cy: it.y, rot: it.rot, hw: it.w / 2, hh: it.h / 2 };
-    case 'lamp': return { cx: it.x, cy: it.y, rot: it.rot, hw: 20, hh: it.kind === 'softbox' ? 27 : it.kind === 'led' ? 21 : 18 };
+    case 'lamp': {
+      if (it.kind === 'practical') {
+        if (it.prac === 'tube') return { cx: it.x, cy: it.y, rot: it.rot, hw: 7, hh: 65 };
+        const r = it.prac === 'floorlamp' ? 25 : it.prac === 'tablelamp' ? 19 : 11;
+        return { cx: it.x, cy: it.y, rot: it.rot, hw: r, hh: r };
+      }
+      if (it.kind === 'cob' && it.mod === 'lantern') return { cx: it.x, cy: it.y, rot: it.rot, hw: 27, hh: 27 };
+      if (it.kind === 'cob' && it.mod === 'softbox') { const c = fromLocal(it, 13, 0); return { cx: c.x, cy: c.y, rot: it.rot, hw: 36, hh: 37 }; }
+      if (it.kind === 'gobo') { const c = fromLocal(it, 6, 0); return { cx: c.x, cy: c.y, rot: it.rot, hw: 31, hh: 13 }; }
+      if (it.kind === 'led') return { cx: it.x, cy: it.y, rot: it.rot, hw: 18, hh: 22 };
+      const c = fromLocal(it, 3, 0);
+      return { cx: c.x, cy: c.y, rot: it.rot, hw: 26, hh: 19 };
+    }
     case 'camera': { const p = fromLocal(it, 2, 0); return { cx: p.x, cy: p.y, rot: it.rot, hw: 25, hh: 15 }; }
-    case 'bounce': case 'mirror': case 'diffusion': case 'flag': return { cx: it.x, cy: it.y, rot: it.rot, hw: it.w / 2 + 4, hh: 7 };
+    case 'bounce': case 'mirror': case 'diffusion': case 'flag': case 'negfill': return { cx: it.x, cy: it.y, rot: it.rot, hw: it.w / 2 + 4, hh: 7 };
     case 'door': { const t = (it.thick || 15) / 2; return { cx: it.x, cy: it.y, rot: it.rot, hw: it.w / 2, hh: t + 2 }; }
     case 'window': return { cx: it.x, cy: it.y, rot: it.rot, hw: it.w / 2, hh: (it.thick || 15) / 2 + 2 };
     case 'wall': {
@@ -922,7 +1113,7 @@ function itemRadius(it) {
     case 'camera': return 24;
     case 'table': return Math.min(it.w, it.h) / 2 + 6;
     case 'wall': return it.thick / 2 + 6;
-    case 'bounce': case 'mirror': case 'diffusion': case 'flag': return 12;
+    case 'bounce': case 'mirror': case 'diffusion': case 'flag': case 'negfill': return 12;
     case 'door': case 'window': return 14;
     default: return 14;
   }
@@ -1013,9 +1204,9 @@ function buildSegs(items) {
         for (let k = 0; k < 8; k++) { const a = pts[k], b = pts[(k + 1) % 8]; push(a.x, a.y, b.x, b.y, 'block', it); }
         break;
       }
-      case 'flag': case 'bounce': case 'mirror': case 'diffusion': {
+      case 'flag': case 'negfill': case 'bounce': case 'mirror': case 'diffusion': {
         const e = panelEnds(it);
-        push(e[0], e[1], e[2], e[3], it.type === 'flag' ? 'block' : it.type, it);
+        push(e[0], e[1], e[2], e[3], it.type === 'flag' || it.type === 'negfill' ? 'block' : it.type, it);
         break;
       }
       default: break;
@@ -1049,7 +1240,8 @@ function traceRays(rays, segs, range, collect) {
   const paths = [];
   for (const r of rays) {
     const path = [];
-    let ox = r.ox, oy = r.oy, dx = r.dx, dy = r.dy, vx = r.vx, vy = r.vy, trav = r.d0, ign = r.ignore, sig = '', energy = 1;
+    let ox = r.ox, oy = r.oy, dx = r.dx, dy = r.dy, vx = r.vx, vy = r.vy, trav = r.d0, ign = r.ignore, sig = '', energy = r.e0 == null ? 1 : r.e0;
+    if (energy <= 0) { paths.push(path); continue; }
     for (let k = 0; k < 8; k++) {
       const rem = range - trav;
       if (rem <= 1) break;
@@ -1111,20 +1303,20 @@ function fanPolys(paths) {
   return polys;
 }
 
-function lampSourceWidth(it) { return it.kind === 'softbox' ? 54 : it.kind === 'led' ? 36 : 0; }
-
-function lampRays(it, beamDeg, n) {
-  const a = it.rot * D2R, half = beamDeg * D2R / 2, sw = lampSourceWidth(it);
+function lampRays(it, beamDeg, n, mask, fullBeam) {
+  const omni = lampOmni(it);
+  const a = it.rot * D2R, half = omni ? Math.PI : beamDeg * D2R / 2, sw = omni ? 0 : lampSourceWidth(it);
   const fx = Math.cos(a), fy = Math.sin(a), px = -fy, py = fx;
-  const front = it.kind === 'softbox' ? 9 : it.kind === 'led' ? 8 : 16;
+  const front = lampFront(it);
   const back = sw ? (sw / 2) / Math.tan(Math.max(half, 0.05)) : 0;
   const cx = it.x + fx * front, cy = it.y + fy * front;
+  const full = (fullBeam || beamDeg) * D2R;
   const rays = [];
   for (let j = 0; j < n; j++) {
     const t = n === 1 ? 0.5 : j / (n - 1);
     const ang = a - half + 2 * half * t;
     const off = (t - 0.5) * sw;
-    rays.push({ ox: cx + px * off, oy: cy + py * off, dx: Math.cos(ang), dy: Math.sin(ang), vx: cx - fx * back, vy: cy - fy * back, d0: back, ignore: null });
+    rays.push({ ox: cx + px * off, oy: cy + py * off, dx: Math.cos(ang), dy: Math.sin(ang), vx: cx - fx * back, vy: cy - fy * back, d0: back, ignore: null, e0: mask ? mask((ang - a) / full) : 1 });
   }
   return { rays, back };
 }
@@ -1148,15 +1340,20 @@ function computeLight(items) {
   for (const it of items) {
     if (it.type !== 'lamp' || !it.on || it.intensity <= 0) continue;
     const rgb = lampRgb(it), I = it.intensity / 100;
-    const fp = fromLocal(it, it.kind === 'softbox' ? 10 : it.kind === 'led' ? 8 : 15, 0);
-    sources.push({ x: fp.x, y: fp.y, rgb, I: I * 0.95, r: it.kind === 'softbox' ? 85 : it.kind === 'led' ? 65 : 55, core: true });
-    sources.push({ x: it.x, y: it.y, rgb, I: I * 0.16, r: Math.min(420, it.range * 0.42) });
-    const n = clamp(Math.round(it.beam * 2.2), 28, 220);
-    const A = lampRays(it, it.beam, n);
+    const omni = lampOmni(it), beam = effBeam(it);
+    const fp = fromLocal(it, lampFront(it) * 0.6, 0);
+    const coreR = it.kind === 'practical' ? 34 : it.kind === 'led' ? 65 : it.mod === 'softbox' ? 95 : it.mod === 'lantern' ? 70 : 55;
+    sources.push({ x: fp.x, y: fp.y, rgb, I: I * 0.95, r: coreR, core: true });
+    sources.push({ x: it.x, y: it.y, rgb, I: I * (omni ? 0.3 : 0.16), r: Math.min(omni ? 300 : 420, it.range * (omni ? 0.6 : 0.42)) });
+    const n = omni ? 180 : clamp(Math.round(beam * 2.2), 28, 220);
+    const mask = it.kind === 'gobo' ? goboRowMask(it.gobo || 'window', it.goboRot || 0) : null;
+    const A = lampRays(it, beam, n, mask, beam);
     const pathsA = traceRays(A.rays, segs, it.range + A.back, collector(rgb, I, n));
-    layers.push({ polys: fanPolys(pathsA), rgb, I: I * 0.5, range: it.range + A.back });
-    const B = lampRays(it, it.beam * 0.62, Math.max(16, Math.round(n * 0.62)));
-    layers.push({ polys: fanPolys(traceRays(B.rays, segs, it.range * 0.92 + B.back, null)), rgb, I: I * 0.42, range: it.range * 0.92 + B.back });
+    layers.push({ polys: fanPolys(pathsA), rgb, I: I * (omni ? 0.7 : 0.5), range: it.range + A.back });
+    if (!omni) {
+      const B = lampRays(it, beam * 0.62, Math.max(16, Math.round(n * 0.62)), mask, beam);
+      layers.push({ polys: fanPolys(traceRays(B.rays, segs, it.range * 0.92 + B.back, null)), rgb, I: I * 0.42, range: it.range * 0.92 + B.back });
+    }
   }
 
   for (let level = 1; level <= 3; level++) {
@@ -1675,13 +1872,13 @@ function drawPerson(ctx, it, px) {
   ctx.beginPath(); ctx.ellipse(4, -21, 7, 5, 0.3, 0, Math.PI * 2); ctx.fill();
   ctx.beginPath(); ctx.ellipse(4, 21, 7, 5, -0.3, 0, Math.PI * 2); ctx.fill();
   // head
-  ctx.fillStyle = '#f2cfae';
-  ctx.strokeStyle = '#a2734f';
+  ctx.fillStyle = it.skin || '#f2cfae';
+  ctx.strokeStyle = shade(it.skin || '#f2cfae', -0.35);
   ctx.beginPath(); ctx.arc(2, 0, 11, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-  ctx.fillStyle = '#4a3324';
+  ctx.fillStyle = it.hair || '#4a3324';
   ctx.beginPath(); ctx.arc(2, 0, 11, Math.PI * 0.5, Math.PI * 1.5); ctx.closePath(); ctx.fill();
   // nose => facing direction
-  ctx.fillStyle = '#e3b48f';
+  ctx.fillStyle = shade(it.skin || '#f2cfae', -0.08);
   ctx.beginPath(); ctx.moveTo(12, -3.5); ctx.lineTo(18, 0); ctx.lineTo(12, 3.5); ctx.closePath(); ctx.fill();
   ctx.restore();
   if (it.label) label(ctx, it.label, it.x, it.y + 38 * s, px);
@@ -1690,52 +1887,151 @@ function drawPerson(ctx, it, px) {
 function drawLamp(ctx, it, px) {
   const on = it.on && it.intensity > 0;
   const rgb = lampRgb(it), col = on ? rgba(rgb, 1) : '#9ca3af';
+  const hot = on ? rgba(rgb.map((v) => lerp(v, 255, 0.55)), 1) : '#cbd5e1';
+  const candle = it.kind === 'practical' && it.prac === 'candle';
+  const br = candle ? breath(it, 90, 0.35) * breath({ x: it.y, y: it.x }, 170, 0.2) : breath(it, 520, 0.25);
+  const circ = (x, y, r) => { ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); };
+  const body = (fn) => { shadowOn(ctx, 16, 6, 0.6); fn(); shadowOff(ctx); };
+  const glowFill = (fn, blur) => { if (on) glowOn(ctx, col, (blur || 18) * br); ctx.fillStyle = hot; fn(); shadowOff(ctx); };
   ctx.save();
   ctx.translate(it.x, it.y);
   ctx.rotate(it.rot * D2R);
-  ctx.lineWidth = 1.4;
+  ctx.lineWidth = 1.3;
   ctx.strokeStyle = 'rgba(255,255,255,0.35)';
-  shadowOn(ctx, 16, 6, 0.6);
-  if (it.kind === 'led') {
-    ctx.fillStyle = '#27272a';
-    roundRect(ctx, -8, -21, 14, 42, 3); ctx.fill(); ctx.stroke();
-    shadowOff(ctx);
+  let labelY = 36;
+  if (it.kind === 'practical') {
+    const p = it.prac || 'bulb';
+    if (on) {
+      const g = ctx.createRadialGradient(0, 0, 0, 0, 0, 44);
+      g.addColorStop(0, rgba(rgb, 0.5 * br));
+      g.addColorStop(1, rgba(rgb, 0));
+      ctx.fillStyle = g;
+      circ(0, 0, 44); ctx.fill();
+    }
+    if (p === 'tube') {
+      body(() => { ctx.fillStyle = '#3f3f46'; roundRect(ctx, -4, -64, 8, 128, 3); ctx.fill(); });
+      glowFill(() => { roundRect(ctx, -2, -60, 4, 120, 2); ctx.fill(); }, 22);
+      labelY = 0;
+    } else if (p === 'tablelamp' || p === 'floorlamp') {
+      const r = p === 'tablelamp' ? 17 : 23;
+      body(() => { ctx.fillStyle = '#eadfcd'; circ(0, 0, r); ctx.fill(); ctx.stroke(); });
+      ctx.strokeStyle = 'rgba(80,60,40,0.35)'; circ(0, 0, r * 0.62); ctx.stroke();
+      glowFill(() => { circ(0, 0, r * 0.32); ctx.fill(); }, 16);
+      labelY = r + 16;
+    } else if (p === 'candle') {
+      body(() => { ctx.fillStyle = '#c9a86a'; circ(0, 0, 7); ctx.fill(); ctx.fillStyle = '#f5ecd6'; circ(0, 0, 4.5); ctx.fill(); });
+      glowFill(() => { circ(0.6, 0, 2.2 * br); ctx.fill(); }, 16);
+      labelY = 22;
+    } else {
+      body(() => { ctx.fillStyle = '#52525b'; circ(0, 0, 4); ctx.fill(); });
+      glowFill(() => { circ(0, 0, 6.5); ctx.fill(); }, 20);
+      labelY = 22;
+    }
+  } else if (it.kind === 'led') {
+    body(() => { ctx.fillStyle = '#27272a'; roundRect(ctx, -8, -21, 14, 42, 3); ctx.fill(); ctx.stroke(); });
     ctx.fillStyle = '#3f3f46';
     ctx.fillRect(-16, -5, 8, 10);
-    if (on) glowOn(ctx, col, 18 * breath(it, 520, 0.25));
-    ctx.fillStyle = col;
-    ctx.fillRect(5, -19, 4, 38);
-  } else if (it.kind === 'softbox') {
-    ctx.fillStyle = '#27272a';
-    ctx.fillRect(-18, -6, 8, 12);
-    ctx.fillStyle = '#3f3f46';
-    ctx.beginPath(); ctx.moveTo(-11, -9); ctx.lineTo(8, -27); ctx.lineTo(8, 27); ctx.lineTo(-11, 9); ctx.closePath(); ctx.fill(); ctx.stroke();
-    shadowOff(ctx);
-    if (on) glowOn(ctx, col, 20 * breath(it, 520, 0.25));
-    ctx.fillStyle = on ? rgba(rgb.map((v) => lerp(v, 255, 0.55)), 1) : '#d1d5db';
-    ctx.fillRect(6, -27, 5, 54);
+    glowFill(() => { ctx.fillRect(5, -19, 4, 38); });
+  } else if (it.kind === 'gobo') {
+    body(() => {
+      ctx.fillStyle = '#232429';
+      roundRect(ctx, -24, -12, 26, 24, 8); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = '#2e3036';
+      ctx.fillRect(2, -9, 18, 18); ctx.strokeRect(2, -9, 18, 18);
+      ctx.fillRect(20, -7, 13, 14); ctx.strokeRect(20, -7, 13, 14);
+    });
+    ctx.fillStyle = '#8b8f99';
+    for (const x of [5, 12]) { ctx.fillRect(x, -12, 3, 3); ctx.fillRect(x, 9, 3, 3); }
+    ctx.fillStyle = '#fbbf24';
+    ctx.fillRect(9.5, -10.5, 2, 21); // gobo slot
+    glowFill(() => { roundRect(ctx, 32, -6, 4, 12, 2); ctx.fill(); }, 16);
   } else {
-    ctx.fillStyle = '#27272a';
-    roundRect(ctx, -18, -13, 30, 26, 5); ctx.fill(); shadowOff(ctx); ctx.stroke();
-    ctx.strokeStyle = '#52525b';
-    ctx.lineWidth = 1.2;
-    ctx.beginPath();
-    for (let k = -8; k <= 8; k += 4) { ctx.moveTo(-15, k); ctx.lineTo(-6, k); }
-    ctx.stroke();
-    // barn doors
-    ctx.strokeStyle = '#3f3f46';
-    ctx.lineWidth = 3;
-    ctx.lineCap = 'round';
-    ctx.beginPath();
-    ctx.moveTo(14, -12); ctx.lineTo(23, -19);
-    ctx.moveTo(14, 12); ctx.lineTo(23, 19);
-    ctx.stroke();
-    if (on) glowOn(ctx, col, 18 * breath(it, 520, 0.25));
-    ctx.fillStyle = col;
-    roundRect(ctx, 11, -10, 5, 20, 2); ctx.fill();
+    const mod = it.mod || 'reflector';
+    if (mod === 'lantern') {
+      body(() => { ctx.fillStyle = '#26272c'; roundRect(ctx, -30, -9, 16, 18, 4); ctx.fill(); });
+      if (on) glowOn(ctx, col, 26 * br);
+      const g = ctx.createRadialGradient(0, 0, 2, 0, 0, 26);
+      g.addColorStop(0, on ? '#ffffff' : '#e5e7eb');
+      g.addColorStop(1, on ? hot : '#cbd5e1');
+      ctx.fillStyle = g;
+      circ(0, 0, 25); ctx.fill();
+      shadowOff(ctx);
+      ctx.strokeStyle = 'rgba(0,0,0,0.12)';
+      for (const r of [9, 17]) { circ(0, 0, r); ctx.stroke(); }
+      labelY = 40;
+    } else {
+      // yoke arms
+      ctx.strokeStyle = '#4b4d55';
+      ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.moveTo(-6, -17); ctx.lineTo(2, -17); ctx.moveTo(-6, 17); ctx.lineTo(2, 17); ctx.stroke();
+      ctx.lineWidth = 1.3;
+      ctx.strokeStyle = 'rgba(255,255,255,0.35)';
+      body(() => { ctx.fillStyle = '#26272c'; roundRect(ctx, -22, -13, 32, 26, 5); ctx.fill(); ctx.stroke(); });
+      ctx.strokeStyle = '#4b4d55';
+      ctx.beginPath();
+      for (let x = -19; x <= -6; x += 3) { ctx.moveTo(x, -11); ctx.lineTo(x, 11); }
+      ctx.stroke();
+      ctx.strokeStyle = 'rgba(255,255,255,0.35)';
+      ctx.fillStyle = '#9ca3af';
+      ctx.fillRect(10, -9, 4, 18);
+      if (mod === 'reflector') {
+        body(() => {
+          const g = ctx.createLinearGradient(14, -18, 26, 18);
+          g.addColorStop(0, '#e5e7eb'); g.addColorStop(0.5, '#9ca3af'); g.addColorStop(1, '#f3f4f6');
+          ctx.fillStyle = g;
+          ctx.beginPath(); ctx.moveTo(14, -9); ctx.lineTo(26, -18); ctx.lineTo(26, 18); ctx.lineTo(14, 9); ctx.closePath(); ctx.fill(); ctx.stroke();
+        });
+        glowFill(() => { ctx.fillRect(24, -16, 2.5, 32); }, 18);
+      } else if (mod === 'fresnel') {
+        body(() => { ctx.fillStyle = '#2b2d33'; roundRect(ctx, 14, -16, 14, 32, 3); ctx.fill(); ctx.stroke(); });
+        glowFill(() => { roundRect(ctx, 27, -13, 3, 26, 1.5); ctx.fill(); }, 18);
+      } else if (mod === 'softbox') {
+        body(() => {
+          ctx.fillStyle = '#1d1e22';
+          ctx.beginPath(); ctx.moveTo(14, -8); ctx.lineTo(46, -36); ctx.lineTo(46, 36); ctx.lineTo(14, 8); ctx.closePath(); ctx.fill(); ctx.stroke();
+        });
+        glowFill(() => { ctx.fillRect(44, -35, 4, 70); }, 22);
+        if (it.grid) {
+          ctx.strokeStyle = 'rgba(12,12,16,0.95)';
+          ctx.lineWidth = 1.2;
+          ctx.strokeRect(44, -35, 7, 70);
+          ctx.beginPath();
+          for (let y = -25; y <= 25; y += 10) { ctx.moveTo(44, y); ctx.lineTo(51, y); }
+          ctx.stroke();
+        }
+        labelY = 48;
+      }
+      if (it.barndoors && (mod === 'reflector' || mod === 'fresnel')) {
+        const fx = mod === 'fresnel' ? 28 : 26, hy = mod === 'fresnel' ? 16 : 18;
+        const ang = clamp((it.doors || 45) / 2, 4, 75) * D2R;
+        ctx.strokeStyle = '#3f3f46';
+        ctx.lineWidth = 3;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        for (const s of [-1, 1]) { ctx.moveTo(fx, s * hy); ctx.lineTo(fx + Math.cos(ang) * 16, s * (hy + Math.sin(ang) * 16)); }
+        ctx.stroke();
+      }
+    }
   }
   ctx.restore();
-  label(ctx, it.label, it.x, it.y + 36, px);
+  label(ctx, it.label, it.x, it.y + labelY, px);
+}
+
+function drawNegHalo(ctx, it) {
+  const s = (it.strength == null ? 60 : it.strength) / 100;
+  if (s <= 0) return;
+  const rr = it.w / 2 + 70;
+  ctx.save();
+  ctx.translate(it.x, it.y);
+  ctx.rotate(it.rot * D2R);
+  ctx.scale(1, (80 + it.w * 0.35) / rr);
+  const g = ctx.createRadialGradient(0, 0, 0, 0, 0, rr);
+  g.addColorStop(0, `rgba(4,5,8,${0.6 * s})`);
+  g.addColorStop(0.55, `rgba(4,5,8,${0.25 * s})`);
+  g.addColorStop(1, 'rgba(4,5,8,0)');
+  ctx.fillStyle = g;
+  ctx.beginPath(); ctx.arc(0, 0, rr, 0, Math.PI * 2); ctx.fill();
+  ctx.restore();
 }
 
 function drawCamera(ctx, it, px) {
@@ -1800,6 +2096,14 @@ function drawPanel(ctx, it, px, glow) {
     ctx.setLineDash([]);
     ctx.fillStyle = '#52525b';
     ctx.beginPath(); ctx.arc(-w / 2, 0, 4.5, 0, Math.PI * 2); ctx.arc(w / 2, 0, 4.5, 0, Math.PI * 2); ctx.fill();
+  } else if (it.type === 'negfill') {
+    ctx.fillStyle = '#040507';
+    ctx.strokeStyle = 'rgba(255,255,255,0.22)';
+    roundRect(ctx, -w / 2, -6, w, 12, 2); ctx.fill(); shadowOff(ctx); ctx.stroke();
+    ctx.strokeStyle = 'rgba(255,255,255,0.07)';
+    ctx.beginPath();
+    for (let x = -w / 2 + 6; x < w / 2 - 3; x += 7) { ctx.moveTo(x, -5); ctx.lineTo(x + 3, 5); }
+    ctx.stroke();
   } else {
     ctx.fillStyle = '#0b0d12';
     ctx.strokeStyle = 'rgba(255,255,255,0.3)';
@@ -1959,6 +2263,7 @@ function drawScene(ctx, o) {
   if (o.light && la > 0.01) drawLightLayer(ctx, o.light, S, T, la * (ANIM_T == null ? 1 : 1 + 0.03 * Math.sin(ANIM_T / 900)));
   ctx.setTransform(T[0], 0, 0, T[0], T[1], T[2]);
   drawRoomLabels(ctx, rooms, px);
+  for (const it of L('negfill')) drawNegHalo(ctx, it);
   const ca = typeof o.cones === 'number' ? o.cones : (o.cones ? 1 : 0);
   if (ca > 0.01) {
     const segs = o.light ? o.light.segs : buildSegs(items);
@@ -1975,7 +2280,7 @@ function drawScene(ctx, o) {
   for (const it of L('stroke')) P(it, () => drawStroke(ctx, it));
   for (const it of L('table')) P(it, () => drawTable(ctx, it, px));
   const glow = o.light && la > 0.01 ? o.light.glow : {};
-  for (const t of ['flag', 'bounce', 'mirror', 'diffusion']) for (const it of L(t)) P(it, () => drawPanel(ctx, it, px, glow[it.id]));
+  for (const t of ['flag', 'negfill', 'bounce', 'mirror', 'diffusion']) for (const it of L(t)) P(it, () => drawPanel(ctx, it, px, glow[it.id]));
   for (const it of L('person')) P(it, () => drawPerson(ctx, it, px));
   for (const it of L('lamp')) P(it, () => drawLamp(ctx, it, px));
   for (const it of L('camera')) P(it, () => drawCamera(ctx, it, px));
@@ -2091,6 +2396,8 @@ function duplicateItem(id) {
 function autoLabel(it) {
   const n = ED.items.filter((i) => i.type === it.type).length;
   if (it.type === 'camera') it.label = 'Cam ' + String.fromCharCode(65 + (n % 26));
+  else if (it.type === 'lamp' && it.kind === 'practical') it.label = { bulb: 'Peertje', tablelamp: 'Schemerlamp', floorlamp: 'Staande lamp', tube: 'TL-buis', candle: 'Kaars' }[it.prac] || 'Practical';
+  else if (it.type === 'lamp' && it.kind === 'gobo') it.label = 'Gobo';
   else if (it.type === 'lamp') it.label = ['Key', 'Fill', 'Back', 'Kicker'][n] || 'Lamp ' + (n + 1);
   else if (it.type === 'person') it.label = n ? 'Talent ' + (n + 1) : 'Talent';
 }
@@ -2167,7 +2474,7 @@ function placeOnWall(it, x, y) {
 }
 
 /* ---------- hit testing ---------- */
-const RANK = { text: 0, link: 1, camera: 2, lamp: 3, person: 4, flag: 5, bounce: 5, mirror: 5, diffusion: 5, table: 6, door: 7, window: 7, stroke: 8, wall: 9 };
+const RANK = { text: 0, link: 1, camera: 2, lamp: 3, person: 4, flag: 5, negfill: 5, bounce: 5, mirror: 5, diffusion: 5, table: 6, door: 7, window: 7, stroke: 8, wall: 9 };
 function hitItem(it, x, y, tol) {
   switch (it.type) {
     case 'wall': return distToSeg(x, y, it.x1, it.y1, it.x2, it.y2).d <= it.thick / 2 + tol;
@@ -2228,8 +2535,10 @@ function handlesOf(it) {
   const hs = [];
   switch (it.type) {
     case 'lamp': case 'camera': {
-      const a = it.rot * D2R, half = (it.type === 'lamp' ? it.beam : it.fov) * D2R / 2, R = it.range;
+      const a = it.rot * D2R, R = it.range;
       hs.push({ k: 'tip', x: it.x + Math.cos(a) * R, y: it.y + Math.sin(a) * R, main: true });
+      if (it.type === 'lamp' && lampOmni(it)) break;
+      const half = (it.type === 'lamp' ? effBeam(it) : it.fov) * D2R / 2;
       hs.push({ k: 'edge', x: it.x + Math.cos(a + half) * R, y: it.y + Math.sin(a + half) * R });
       hs.push({ k: 'edge', x: it.x + Math.cos(a - half) * R, y: it.y + Math.sin(a - half) * R });
       break;
@@ -2240,7 +2549,7 @@ function handlesOf(it) {
       const r = fromLocal(it, 0, -it.h / 2 - 30); hs.push({ k: 'rot', x: r.x, y: r.y, main: true });
       break;
     }
-    case 'bounce': case 'mirror': case 'diffusion': case 'flag': {
+    case 'bounce': case 'mirror': case 'diffusion': case 'flag': case 'negfill': {
       const e = panelEnds(it); hs.push({ k: 'e1', x: e[0], y: e[1] }, { k: 'e2', x: e[2], y: e[3] }); break;
     }
     case 'door': case 'window': {
@@ -2331,8 +2640,8 @@ function drawHandles(it) {
   const px = 1 / ED.view.z;
   const hs = handlesOf(it);
   ctx.save();
-  if (it.type === 'lamp' || it.type === 'camera') {
-    const a = it.rot * D2R, half = (it.type === 'lamp' ? it.beam : it.fov) * D2R / 2;
+  if ((it.type === 'lamp' || it.type === 'camera') && hs.length === 3) {
+    const a = it.rot * D2R, half = (it.type === 'lamp' ? effBeam(it) : it.fov) * D2R / 2;
     ctx.strokeStyle = 'rgba(179,168,255,0.75)';
     ctx.lineWidth = 1.4 * px;
     glowOn(ctx, 'rgba(139,124,255,0.8)', 8);
@@ -2407,6 +2716,24 @@ function drawOverlays(items) {
   HOVER.a += (1 - HOVER.a) * 0.22;
   if (ED.hover && ED.hover !== ED.sel && ED.tool === 'select' && !drag) { const h = find(ED.hover); if (h) outline(h, items, `rgba(139,124,255,${0.55 * HOVER.a})`, false); }
   if (drag && drag.mode === 'link' && drag.target) { const t = find(drag.target); if (t) outline(t, items, ACCENT, false); }
+  // press-and-hold: a gradient glow that grows stronger until the menu opens
+  if (drag && drag.mode === 'move' && !drag.moved && !drag.longOpened && drag.t0) {
+    const k = clamp((performance.now() - drag.t0 - 80) / 600, 0, 1);
+    const h = k > 0 && find(drag.id);
+    if (h) {
+      const c = itemCenter(h, items), R = (itemRadius(h) + 34) * (0.7 + 0.9 * k);
+      const g = ctx.createRadialGradient(c.x, c.y, 0, c.x, c.y, R);
+      g.addColorStop(0, `rgba(253,230,138,${0.08 + 0.5 * k * k})`);
+      g.addColorStop(0.35, `rgba(244,114,182,${0.1 + 0.45 * k})`);
+      g.addColorStop(0.7, `rgba(139,124,255,${0.06 + 0.3 * k})`);
+      g.addColorStop(1, 'rgba(139,124,255,0)');
+      ctx.save();
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.arc(c.x, c.y, R, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+    }
+  }
   const sel = find(ED.sel);
   if (sel) { outline(sel, items, ACCENT, true); drawHandles(sel); }
 
@@ -2596,6 +2923,7 @@ function frame() {
   for (let i = DYING.length - 1; i >= 0; i--) if (tnow - DYING[i].t0 > 260) DYING.splice(i, 1);
   if (DYING.length) active = true;
   if (HOVER.a < 0.97 && ED.hover) active = true;
+  if (drag && drag.mode === 'move' && !drag.moved && !drag.longOpened) active = true;
   // gentle ambient motion (breathing lamps, marching selection) at ~30 fps while someone is working
   if (!RM && ED.items.length && tnow - lastInput < 45000 && tnow - lastAmb > 33) { lastAmb = tnow; active = true; }
   for (const [id, a] of anim) {
@@ -2750,21 +3078,25 @@ function startLongPress(e, id) {
   cancelLongPress();
   pressEl.style.left = e.clientX + 'px';
   pressEl.style.top = e.clientY + 'px';
-  pressEl.classList.remove('hidden', 'run');
+  pressEl.classList.remove('hidden', 'run', 'done');
   void pressEl.getBoundingClientRect();
   pressEl.classList.add('run');
   lpTimer = setTimeout(() => {
     lpTimer = null;
-    pressEl.classList.add('hidden');
     if (drag && drag.mode === 'move' && !drag.moved && drag.id === id) {
       drag.longOpened = true;
+      pressEl.classList.add('done');
+      setTimeout(() => { pressEl.classList.add('hidden'); pressEl.classList.remove('run', 'done'); }, 330);
+      const it = byId(id);
+      if (it) { const c = itemCenter(it, ED.items); ripple(c.x, c.y); }
       openPopup(id);
-      try { if (navigator.vibrate) navigator.vibrate(12); } catch (_) { /* ignore */ }
-    }
-  }, 520);
+      try { if (navigator.vibrate) navigator.vibrate(14); } catch (_) { /* ignore */ }
+    } else pressEl.classList.add('hidden');
+  }, 680);
 }
 function cancelLongPress() {
   if (lpTimer) { clearTimeout(lpTimer); lpTimer = null; }
+  if (pressEl.classList.contains('done')) return;
   pressEl.classList.add('hidden');
   pressEl.classList.remove('run');
 }
@@ -2829,7 +3161,7 @@ function downSelect(e, p, w) {
   if (hit) {
     if (ED.sel !== hit.id) closePopup();
     select(hit.id);
-    drag = { mode: 'move', id: hit.id, sx: p.x, sy: p.y, w0: w, orig: clone(hit), moved: false };
+    drag = { mode: 'move', id: hit.id, sx: p.x, sy: p.y, w0: w, orig: clone(hit), moved: false, t0: performance.now() };
     startLongPress(e, hit.id);
     return;
   }
@@ -2993,7 +3325,9 @@ function handleDrag(w, shift) {
         it.range = clamp(snap ? Math.round(r / 10) * 10 : Math.round(r), 60, 3000);
       } else {
         const v = clamp(Math.round(Math.abs(angDiff(a, it.rot)) * 2), 4, 170);
-        it[it.type === 'lamp' ? 'beam' : 'fov'] = it.type === 'camera' ? Math.min(v, 120) : v;
+        if (it.type === 'camera') it.fov = Math.min(v, 120);
+        else if (it.kind === 'cob' && it.barndoors && (it.mod === 'reflector' || it.mod === 'fresnel')) { it.doors = v; if (it.beam < v) it.beam = v; }
+        else it.beam = v;
       }
       break;
     }
@@ -3014,7 +3348,7 @@ function handleDrag(w, shift) {
       }
       break;
     }
-    case 'bounce': case 'mirror': case 'diffusion': case 'flag': {
+    case 'bounce': case 'mirror': case 'diffusion': case 'flag': case 'negfill': {
       const e = panelEnds(drag.start);
       const f = k === 'e2' ? { x: e[0], y: e[1] } : { x: e[2], y: e[3] };
       let n = snap ? snapPoint(w) : w;
@@ -3060,7 +3394,6 @@ function endPointer(e) {
   switch (d.mode) {
     case 'move':
       if (d.moved) { commit(); const it = byId(d.id); if (it && snapOn()) { const c = itemCenter(it, ED.items); ripple(c.x, c.y); } }
-      else if (!d.longOpened && e.type !== 'pointercancel') openPopup(d.id);
       snapFx.show = false;
       break;
     case 'handle': commit(); snapFx.show = false; break;
@@ -3088,7 +3421,6 @@ function endPointer(e) {
       if (d.target || !(d.x >= r.x && d.x <= r.x + r.w && d.y >= r.y && d.y <= r.y + r.h)) {
         const l = Object.assign({ id: uid(), type: 'link', from: d.from, to: d.target, x2: d.x, y2: d.y }, clone(DEFAULTS.link));
         addItem(l); select(l.id); commit();
-        openPopup(l.id);
       }
       break;
     }
@@ -3099,11 +3431,6 @@ function endPointer(e) {
 cv.addEventListener('pointerup', endPointer);
 cv.addEventListener('pointercancel', endPointer);
 cv.addEventListener('pointerleave', () => { if (!drag) { pointer.in = false; ED.hover = null; needs = true; } });
-cv.addEventListener('dblclick', (e) => {
-  if (ED.tool !== 'select') return;
-  const h = hitTest(toWorld(evPos(e)));
-  if (h) openPopup(h.id, { focus: h.type === 'text' });
-});
 cv.addEventListener('wheel', (e) => {
   e.preventDefault();
   VT = null;
@@ -3296,28 +3623,50 @@ const CAM_COLORS = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#06b6d4', '#3b8
 const WALL_COLORS = ['#e9edf5', '#cbd5e1', '#94a3b8', '#fcd9b6', '#a5b4fc', '#5eead4', '#f9a8d4', '#1f2937'];
 const LINE_COLORS = ['#e2e8f0', '#ffffff', '#fda4af', '#fdba74', '#fde047', '#86efac', '#7dd3fc', '#c4b5fd', '#f472b6', '#111827'];
 const TEXT_COLORS = ['#111827', '#4b5563', '#ef4444', '#f97316', '#16a34a', '#2563eb', '#7c3aed', '#db2777'];
+const SKIN_COLORS = ['#f3d5c0', '#e8bc9a', '#e0ac8a', '#c98e66', '#a86b4a', '#7a4a32', '#5a3624', '#3d2418'];
+const HAIR_COLORS = ['#141010', '#3b2a1e', '#6b4428', '#a8743d', '#d8b46a', '#e8e0d0', '#8b2e1f', '#9aa3b2'];
+const PANTS_COLORS = ['#2b303b', '#1e3a5f', '#3f3f46', '#e5e7eb', '#5b4636', '#14532d', '#111827', '#9a3412'];
 const BG_COLORS = ['#fff4bf', '#ffffff', '#dbeafe', '#dcfce7', '#fce7f3', '#ede9fe', '#fee2e2', '#111827'];
 const cmFmt = (v) => fmtM(Math.round(v));
-const LABEL_TYPES = { person: 1, table: 1, lamp: 1, camera: 1, bounce: 1, mirror: 1, diffusion: 1, flag: 1 };
+const LABEL_TYPES = { person: 1, table: 1, lamp: 1, camera: 1, bounce: 1, mirror: 1, diffusion: 1, flag: 1, negfill: 1 };
 
 function fieldsFor(it) {
   const rot = { k: 'rot', t: 'angle', l: 'Richting' };
   const sw = (k, l, opts, none) => ({ k, t: 'swatches', l, opts, none });
   const width = (min, max) => ({ k: 'w', t: 'range', l: 'Breedte', min, max, step: 5, fmt: cmFmt });
   switch (it.type) {
-    case 'person': return [{ k: 'rot', t: 'angle', l: 'Kijkrichting' }, sw('color', 'Kleding', PEOPLE_COLORS), { k: 'size', t: 'range', l: 'Grootte', min: 0.6, max: 1.6, step: 0.05, fmt: (v) => Math.round(v * 100) + '%' }];
+    case 'person': return [{ k: 'rot', t: 'angle', l: 'Kijkrichting' }, sw('color', 'Kleding', PEOPLE_COLORS), sw('skin', 'Huidskleur', SKIN_COLORS), sw('hair', 'Haarkleur', HAIR_COLORS), sw('pants', 'Broek', PANTS_COLORS), { k: 'size', t: 'range', l: 'Grootte', min: 0.6, max: 1.6, step: 0.05, fmt: (v) => Math.round(v * 100) + '%' }];
     case 'table': return [{ k: 'shape', t: 'seg', l: 'Vorm', opts: [['rect', 'Rechthoek'], ['round', 'Rond']] }, width(30, 500), { k: 'h', t: 'range', l: 'Diepte', min: 30, max: 500, step: 5, fmt: cmFmt }, sw('color', 'Kleur', WOOD_COLORS), rot];
-    case 'lamp': return [
-      { k: 'on', t: 'toggle', l: 'Lamp aan' },
-      { k: 'kind', t: 'seg', l: 'Type', opts: [['fresnel', 'Fresnel'], ['led', 'LED'], ['softbox', 'Softbox']] },
-      { k: 'intensity', t: 'range', l: 'Intensiteit', min: 0, max: 100, step: 1, fmt: (v) => v + '%' },
-      { k: 'kelvin', t: 'kelvin', l: 'Kleurtemperatuur' },
-      { k: 'gel', t: 'gel', l: 'Gel / kleurfilter' },
-      { k: 'beam', t: 'range', l: 'Bundelhoek', min: 5, max: 170, step: 1, fmt: (v) => v + '°' },
-      { k: 'range', t: 'range', l: 'Reikwijdte', min: 100, max: 2500, step: 10, fmt: cmFmt },
-      { k: 'height', t: 'range', l: 'Hoogte (statief)', min: 30, max: 450, step: 5, fmt: cmFmt, get: (o) => o.height || (o.kind === 'softbox' ? 170 : 190) },
-      rot,
-    ];
+    case 'lamp': {
+      const f = [
+        { k: 'on', t: 'toggle', l: 'Lamp aan' },
+        { k: 'kind', t: 'seg', l: 'Armatuur', opts: [['cob', 'COB'], ['led', 'LED'], ['gobo', 'Gobo'], ['practical', 'Practical']],
+          set: (o, v) => { o.kind = v; if (v === 'cob' && !o.mod) o.mod = 'reflector'; if (v === 'gobo' && !o.gobo) o.gobo = 'window'; if (v === 'practical' && !o.prac) o.prac = 'bulb'; } },
+      ];
+      if (it.kind === 'cob') {
+        f.push({ k: 'mod', t: 'seg', l: 'Kop', opts: [['reflector', 'Reflector'], ['fresnel', 'Fresnel'], ['softbox', 'Softbox'], ['lantern', 'Lantaarn']] });
+        if (it.mod === 'softbox') f.push({ k: 'grid', t: 'toggle', l: 'Grid (egg crate)' });
+        if (it.mod === 'reflector' || it.mod === 'fresnel') {
+          f.push({ k: 'barndoors', t: 'toggle', l: 'Barndoors', refresh: true });
+          if (it.barndoors) f.push({ k: 'doors', t: 'range', l: 'Opening barndoors', min: 6, max: 120, step: 1, fmt: (v) => v + '°', get: (o) => o.doors || 45 });
+        }
+      }
+      if (it.kind === 'gobo') f.push({ k: 'gobo', t: 'gobo', l: 'Gobo' }, { k: 'goboRot', t: 'range', l: 'Gobo draaien', min: 0, max: 360, step: 5, fmt: (v) => v + '°', get: (o) => o.goboRot || 0 });
+      if (it.kind === 'practical') f.push({ k: 'prac', t: 'seg', l: 'Soort', opts: [['bulb', 'Peer'], ['tablelamp', 'Schemer'], ['floorlamp', 'Staand'], ['tube', 'TL'], ['candle', 'Kaars']] });
+      f.push({ k: 'intensity', t: 'range', l: 'Intensiteit', min: 0, max: 100, step: 1, fmt: (v) => v + '%' });
+      const cm = it.cmode || (it.gel ? 'gel' : 'cct');
+      f.push({ k: 'cmode', t: 'seg', l: 'Kleur', opts: [['cct', 'Kelvin'], ['rgb', 'RGB'], ['gel', 'Gel']], get: () => cm,
+        set: (o, v) => { o.cmode = v; if (v === 'gel' && !o.gel) o.gel = GELS[1][0]; } });
+      if (cm === 'cct') f.push({ k: 'kelvin', t: 'kelvin', l: 'Kleurtemperatuur' });
+      else if (cm === 'rgb') f.push({ k: 'hue', t: 'range', cls: 'hue', l: 'Tint', min: 0, max: 360, step: 1, fmt: (v) => v + '°', get: (o) => o.hue || 0 },
+        { k: 'sat', t: 'range', l: 'Verzadiging', min: 0, max: 100, step: 1, fmt: (v) => v + '%', get: (o) => (o.sat == null ? 100 : o.sat) });
+      else f.push({ k: 'gel', t: 'gel', l: 'Gel / kleurfilter' });
+      if (!lampOmni(it)) f.push({ k: 'beam', t: 'range', l: it.kind === 'cob' && it.mod === 'fresnel' ? 'Spot ↔ flood' : 'Bundelhoek', min: 5, max: 170, step: 1, fmt: (v) => v + '°' });
+      f.push({ k: 'range', t: 'range', l: 'Reikwijdte', min: 80, max: 2500, step: 10, fmt: cmFmt });
+      if (!(it.kind === 'practical' && PRAC_AUTO[it.prac])) f.push({ k: 'height', t: 'range', l: it.kind === 'practical' ? 'Hoogte' : 'Hoogte (statief)', min: 30, max: 450, step: 5, fmt: cmFmt, get: lampHeight });
+      if (!lampOmni(it) || (it.kind === 'practical' && it.prac === 'tube')) f.push(rot);
+      return f;
+    }
     case 'camera': return [
       { k: 'lens', t: 'seg', l: 'Lens (full frame, mm)', opts: LENSES.map((m) => [m, String(m)]), get: (o) => LENSES.find((m) => fovFromLens(m) === o.fov), set: (o, v) => { o.fov = fovFromLens(v); } },
       { k: 'fov', t: 'range', l: 'Beeldhoek', min: 8, max: 120, step: 1, fmt: (v) => `${v}° · ≈${lensFromFov(v)}mm` },
@@ -3331,6 +3680,7 @@ function fieldsFor(it) {
     case 'mirror': return [{ k: 'reflect', t: 'range', l: 'Reflectie', min: 10, max: 100, step: 1, fmt: (v) => v + '%' }, width(20, 300), rot];
     case 'diffusion': return [{ k: 'strength', t: 'seg', l: 'Doek', opts: [[25, '¼ grid'], [50, '½ grid'], [100, 'Full grid']] }, { k: 'strength', t: 'range', l: 'Diffusie', min: 0, max: 100, step: 1, fmt: (v) => v + '%' }, width(30, 400), rot];
     case 'flag': return [width(20, 400), rot];
+    case 'negfill': return [{ k: 'strength', t: 'range', l: 'Lichtafname', min: 0, max: 100, step: 1, fmt: (v) => v + '%' }, width(40, 400), rot];
     case 'door': return [{ k: 'w', t: 'range', l: 'Breedte', min: 50, max: 250, step: 5, fmt: cmFmt }, { k: 'flip', t: 'toggle', l: 'Scharnier andere kant' }, { k: 'swap', t: 'toggle', l: 'Draait naar de andere kant' }];
     case 'window': return [{ k: 'w', t: 'range', l: 'Breedte', min: 40, max: 500, step: 5, fmt: cmFmt }];
     case 'wall': return [
@@ -3369,12 +3719,12 @@ function fieldHtml(f, it, i) {
   const head = (val) => `<div class="fld-h"><span>${esc(f.l)}</span>${val != null ? `<span class="v">${esc(val)}</span>` : ''}</div>`;
   switch (f.t) {
     case 'range':
-      return `<div class="fld" data-i="${i}" style="--i:${i}">${head(f.fmt ? f.fmt(v) : v)}<input type="range" class="rng" min="${f.min}" max="${f.max}" step="${f.step || 1}" value="${v}" style="--p:${pct(f, v)}%"></div>`;
+      return `<div class="fld" data-i="${i}" style="--i:${i}">${head(f.fmt ? f.fmt(v) : v)}<input type="range" class="rng ${f.cls || ''}" min="${f.min}" max="${f.max}" step="${f.step || 1}" value="${v}" style="--p:${pct(f, v)}%"></div>`;
     case 'kelvin':
-      return `<div class="fld" data-i="${i}" style="--i:${i}">${head(it.gel ? 'gel actief' : v + ' K')}<input type="range" class="rng kel" min="2000" max="10000" step="100" value="${v}">` +
+      return `<div class="fld" data-i="${i}" style="--i:${i}">${head(v + ' K')}<input type="range" class="rng kel" min="2000" max="10000" step="100" value="${v}">` +
         `<div class="dial-btns" style="margin-top:8px">${[[2700, 'Huiskamer'], [3200, 'Tungsten'], [4300, 'Neutraal'], [5600, 'Daglicht'], [6500, 'Bewolkt']].map(([k, n]) => `<button class="chip" data-k="${k}" title="${n}">${k}K</button>`).join('')}</div></div>`;
     case 'gel':
-      return `<div class="fld" data-i="${i}" style="--i:${i}">${head(null)}<div class="sw gel-row">${GELS.map(([c, n]) =>
+      return `<div class="fld" data-i="${i}" style="--i:${i}">${head(null)}<div class="sw gel-row">${GELS.slice(1).map(([c, n]) =>
         `<button class="${c === (v || '') ? 'on' : ''} ${c ? '' : 'none'}" data-v="${c}" title="${n}" style="background:${c || '#fff'}">${c ? '' : 'Geen'}</button>`).join('')}</div></div>`;
     case 'swatches':
       return `<div class="fld" data-i="${i}" style="--i:${i}">${head(null)}<div class="sw">${f.none ? `<button class="none ${v === 'transparent' ? 'on' : ''}" data-v="transparent" title="Geen"></button>` : ''}${f.opts.map((c) =>
@@ -3385,12 +3735,21 @@ function fieldHtml(f, it, i) {
       return `<div class="fld" data-i="${i}" style="--i:${i}"><label class="tgl"><span>${esc(f.l)}</span><input type="checkbox" ${v ? 'checked' : ''}><span class="sl"></span></label></div>`;
     case 'angle':
       return `<div class="fld" data-i="${i}" style="--i:${i}"><div class="dial-row">${dialSvg(v)}<div style="flex:1">${head(Math.round(v) + '°')}<div class="dial-btns"><button class="chip" data-d="-15">−15°</button><button class="chip" data-d="15">+15°</button><button class="chip" data-d="90">↻ 90°</button><button class="chip" data-d="180">180°</button></div></div></div></div>`;
+    case 'gobo':
+      return `<div class="fld" data-i="${i}" style="--i:${i}">${head(null)}<div class="gobo-grid">${GOBOS.map(([k, n]) =>
+        `<button class="${k === v ? 'on' : ''}" data-v="${k}" title="${esc(n)}"><img src="${goboThumb(k)}" alt=""><span>${esc(n)}</span></button>`).join('')}</div></div>`;
     case 'textarea':
       return `<div class="fld" data-i="${i}" style="--i:${i}">${head(null)}<textarea class="inp" rows="3">${esc(v)}</textarea></div>`;
     default: return '';
   }
 }
-function iconFor(it) { return it.type === 'lamp' ? I[it.kind] || I.fresnel : I[it.type] || I.blank; }
+function iconFor(it) {
+  if (it.type !== 'lamp') return I[it.type] || I.blank;
+  if (it.kind === 'practical') return I[it.prac] || I.bulb;
+  if (it.kind === 'gobo') return I.gobo;
+  if (it.kind === 'led') return I.led;
+  return { fresnel: I.fresnel, softbox: I.softbox, lantern: I.bulb }[it.mod] || I.cob;
+}
 function buildPopup(it) {
   const fields = fieldsFor(it);
   const hasLabel = !!LABEL_TYPES[it.type];
@@ -3424,8 +3783,8 @@ function wireField(el, f, it) {
     }
     case 'kelvin': {
       const r = $('input', el);
-      r.oninput = () => { if (it.gel) { it.gel = ''; syncGel(it); } fset(f, it, Number(r.value)); vEl.textContent = r.value + ' K'; };
-      el.querySelectorAll('[data-k]').forEach((b) => { b.onclick = () => { it.gel = ''; fset(f, it, Number(b.dataset.k)); refreshPopup(); }; });
+      r.oninput = () => { fset(f, it, Number(r.value)); vEl.textContent = r.value + ' K'; };
+      el.querySelectorAll('[data-k]').forEach((b) => { b.onclick = () => { fset(f, it, Number(b.dataset.k)); refreshPopup(); }; });
       break;
     }
     case 'gel':
@@ -3443,7 +3802,7 @@ function wireField(el, f, it) {
       });
       break;
     case 'toggle':
-      $('input', el).onchange = (e) => { fset(f, it, e.target.checked); };
+      $('input', el).onchange = (e) => { fset(f, it, e.target.checked); if (f.refresh) refreshPopup(); };
       break;
     case 'angle': {
       const svg = $('svg', el);
@@ -3466,6 +3825,9 @@ function wireField(el, f, it) {
       el.querySelectorAll('[data-d]').forEach((b) => { b.onclick = () => setA(it.rot + Number(b.dataset.d)); });
       break;
     }
+    case 'gobo':
+      el.querySelectorAll('button').forEach((b) => { b.onclick = () => { fset(f, it, b.dataset.v); el.querySelectorAll('button').forEach((x) => x.classList.toggle('on', x === b)); }; });
+      break;
     case 'textarea': {
       const ta = $('textarea', el);
       ta.oninput = () => { fset(f, it, ta.value); };
@@ -3695,6 +4057,7 @@ function confirmBox(title, text, okLabel, ok) {
   });
 }
 function createProject(name, items, open) {
+  items.forEach(normalizeLamp);
   const p = { id: uid(), name, created: Date.now(), updated: Date.now(), data: { v: 2, items, settings: clone(DEFAULT_SETTINGS), view: null }, thumb: null };
   try { p.thumb = makeThumb(items, p.data.settings); } catch (_) { /* ignore */ }
   loadProjects().push(p);
@@ -3782,6 +4145,7 @@ function openProject(id) {
   ED.proj = p;
   const d = p.data || {};
   ED.items = clone(d.items || []);
+  ED.items.forEach(normalizeLamp);
   if (!(d.v >= 2)) {
     for (const it of ED.items) {
       if (it.type === 'wall' && it.color === '#1f2937') it.color = '#e9edf5';
@@ -3810,7 +4174,7 @@ function openProject(id) {
   ED.ver++;
   needs = true;
   if (!sessionStorageGet('lichtplan.tips')) {
-    showHint('Tip: sleep objecten uit de zijbalk · klik op een object voor eigenschappen', 4500);
+    showHint('Tip: tik om te selecteren en te verplaatsen · houd een object ingedrukt voor eigenschappen', 5000);
     sessionStorageSet('lichtplan.tips', '1');
   }
 }
@@ -3905,10 +4269,130 @@ $('#pvGrip').addEventListener('pointerdown', (e) => {
 
 function pvDispose(sc) {
   sc.traverse((o) => {
-    if (o.geometry) o.geometry.dispose();
+    if (o.geometry && !o.geometry.userData.keep) o.geometry.dispose();
     if (o.material) (Array.isArray(o.material) ? o.material : [o.material]).forEach((m) => m.dispose());
     if (o.shadow && o.shadow.map) o.shadow.map.dispose();
   });
+}
+
+const PVX = { tex: new Map() };
+function pvTex(key, size, draw, rep) {
+  const T = window.THREE;
+  let t = PVX.tex.get(key);
+  if (t) return t;
+  const c = document.createElement('canvas');
+  c.width = c.height = size;
+  draw(c.getContext('2d'), size);
+  t = new T.CanvasTexture(c);
+  t.wrapS = t.wrapT = T.RepeatWrapping;
+  if (rep) t.repeat.set(rep, rep);
+  t.encoding = T.sRGBEncoding;
+  t.anisotropy = 4;
+  PVX.tex.set(key, t);
+  return t;
+}
+function drawPlanks(c, S) {
+  const rnd = mulberry(5);
+  c.fillStyle = '#d9d9d9'; c.fillRect(0, 0, S, S);
+  const rows = 10, h = S / rows;
+  for (let r = 0; r < rows; r++) {
+    let x = -rnd() * S * 0.5;
+    while (x < S) {
+      const len = S * (0.35 + rnd() * 0.5), v = Math.round(200 + rnd() * 50);
+      c.fillStyle = `rgb(${v},${v},${v})`;
+      c.fillRect(x, r * h, len, h);
+      c.strokeStyle = 'rgba(0,0,0,0.10)';
+      for (let g = 0; g < 5; g++) { const y = r * h + rnd() * h; c.beginPath(); c.moveTo(x, y); c.bezierCurveTo(x + len * 0.3, y + 2, x + len * 0.6, y - 2, x + len, y); c.stroke(); }
+      c.fillStyle = 'rgba(0,0,0,0.25)';
+      c.fillRect(x, r * h, 1.5, h);
+      x += len;
+    }
+    c.fillStyle = 'rgba(0,0,0,0.28)';
+    c.fillRect(0, r * h, S, 1.5);
+  }
+}
+function drawConcrete(c, S) {
+  const rnd = mulberry(9);
+  c.fillStyle = '#bfbfbf'; c.fillRect(0, 0, S, S);
+  for (let i = 0; i < 2600; i++) { const v = Math.round(150 + rnd() * 90); c.fillStyle = `rgba(${v},${v},${v},0.35)`; c.fillRect(rnd() * S, rnd() * S, 1 + rnd() * 2.5, 1 + rnd() * 2.5); }
+}
+function drawLedGrid(c, S) {
+  c.fillStyle = '#9a9a9a'; c.fillRect(0, 0, S, S);
+  c.fillStyle = '#ffffff';
+  const n = 16, st = S / n;
+  for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) { c.beginPath(); c.arc(st * (i + 0.5), st * (j + 0.5), st * 0.3, 0, Math.PI * 2); c.fill(); }
+}
+
+/* One smooth head mesh: an ellipsoid sculpted with soft bumps and dents
+   (sockets, brow, nose, cheekbones, lips, chin, jaw) and painted with
+   vertex colours for lips, brows and a little blush. */
+const headGeoCache = new Map();
+function sculptHead(skinHex, browHex) {
+  const T = window.THREE, key = skinHex + browHex;
+  if (headGeoCache.has(key)) return headGeoCache.get(key);
+  const geo = new T.SphereGeometry(1, 96, 72);
+  const pos = geo.attributes.position, n = pos.count, col = new Float32Array(n * 3);
+  const SX = 10, SY = 12, SZ = 8.6;
+  const sm = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
+  const G = (u, v, cu, cv, su, sv) => Math.exp(-(((u - cu) / su) ** 2 + ((v - cv) / sv) ** 2));
+  const skin = new T.Color(skinHex), lip = skin.clone().lerp(new T.Color('#a8484e'), 0.62), brow = new T.Color(browHex), blush = skin.clone().lerp(new T.Color('#d9776b'), 0.35);
+  const c = new T.Color();
+  for (let i = 0; i < n; i++) {
+    const x = pos.getX(i), y = pos.getY(i), z = pos.getZ(i);
+    const u = z, v = y, fw = sm(0.15, 0.7, x);
+    let d = 0;
+    d -= 0.075 * (G(u, v, 0.31, 0.12, 0.12, 0.085) + G(u, v, -0.31, 0.12, 0.12, 0.085));
+    d += 0.04 * G(u, v, 0, 0.29, 0.5, 0.06);
+    d += 0.12 * G(u, v, 0, 0.06, 0.05, 0.16) + 0.2 * G(u, v, 0, -0.1, 0.065, 0.065);
+    d += 0.06 * (G(u, v, 0.085, -0.15, 0.05, 0.04) + G(u, v, -0.085, -0.15, 0.05, 0.04));
+    d += 0.05 * (G(u, v, 0.42, -0.03, 0.15, 0.12) + G(u, v, -0.42, -0.03, 0.15, 0.12));
+    d += 0.06 * G(u, v, 0, -0.3, 0.15, 0.035) + 0.065 * G(u, v, 0, -0.4, 0.13, 0.04) - 0.03 * G(u, v, 0, -0.352, 0.15, 0.012);
+    d += 0.07 * G(u, v, 0, -0.63, 0.14, 0.09);
+    d *= fw;
+    const jaw = sm(-0.15, -0.85, y) * sm(0.05, 0.85, Math.abs(z)) * (0.5 + 0.5 * sm(-0.3, 0.6, x));
+    const neck = sm(-0.8, -1, y) * 0.25;
+    const r = 1 + d - 0.2 * jaw - neck;
+    pos.setXYZ(i, x * r * SX, y * r * SY, z * r * SZ);
+    c.copy(skin);
+    const lipW = fw * G(u, v, 0, -0.355, 0.135, 0.055);
+    if (lipW > 0.02) c.lerp(lip, Math.min(1, lipW * 1.9));
+    const browW = fw * Math.max(G(u, v, 0.3, 0.3 - 0.06 * Math.abs(u - 0.3), 0.14, 0.022), G(u, v, -0.3, 0.3 - 0.06 * Math.abs(u + 0.3), 0.14, 0.022));
+    if (browW > 0.02) c.lerp(brow, Math.min(0.9, browW * 1.3));
+    const bl = fw * (G(u, v, 0.4, -0.12, 0.13, 0.1) + G(u, v, -0.4, -0.12, 0.13, 0.1));
+    if (bl > 0.02) c.lerp(blush, Math.min(0.5, bl));
+    const sock = fw * (G(u, v, 0.31, 0.12, 0.12, 0.08) + G(u, v, -0.31, 0.12, 0.12, 0.08));
+    c.multiplyScalar(1 - 0.12 * sock);
+    col[i * 3] = c.r; col[i * 3 + 1] = c.g; col[i * 3 + 2] = c.b;
+  }
+  geo.setAttribute('color', new T.BufferAttribute(col, 3));
+  geo.computeVertexNormals();
+  geo.userData.keep = true;
+  headGeoCache.set(key, geo);
+  return geo;
+}
+
+/* Hair: a slightly larger shell whose face-side vertices sink inside the
+   head, leaving a soft, natural hairline instead of a helmet edge. */
+let hairGeo = null;
+function sculptHair() {
+  if (hairGeo) return hairGeo;
+  const T = window.THREE;
+  const geo = new T.SphereGeometry(1, 96, 64);
+  const pos = geo.attributes.position;
+  const sm = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
+  for (let i = 0; i < pos.count; i++) {
+    const x = pos.getX(i), y = pos.getY(i), z = pos.getZ(i);
+    const f = sm(-0.15, 0.35, x);
+    const hl = lerp(-0.5, 0.36 - 0.32 * z * z, f);
+    const w = sm(hl - 0.07, hl + 0.05, y);
+    const noise = Math.sin(x * 9 + y * 3) * Math.sin(y * 7 + z * 5) * Math.sin(z * 11 + x * 2);
+    const r = 0.88 + w * (0.17 + 0.008 * noise + 0.03 * sm(0.2, 1, y));
+    pos.setXYZ(i, x * r * 10, y * r * 12, z * r * 8.6);
+  }
+  geo.computeVertexNormals();
+  geo.userData.keep = true;
+  hairGeo = geo;
+  return geo;
 }
 
 function pvBuild(items, camIt) {
@@ -3918,180 +4402,367 @@ function pvBuild(items, camIt) {
   sc.background = new T.Color('#1b1f27');
   sc.fog = new T.Fog('#1b1f27', 1800, 5000);
   const std = (c, o) => new T.MeshStandardMaterial(Object.assign({ color: c, roughness: 0.85, metalness: 0 }, o || {}));
+  const glowM = (c) => new T.MeshBasicMaterial({ color: c, toneMapped: false });
   const add = (m, cast, recv, parent) => { m.castShadow = cast !== false; m.receiveShadow = recv !== false; (parent || sc).add(m); return m; };
   const box = (w, h, d, mat) => new T.Mesh(new T.BoxGeometry(w, h, d), mat);
-  const cyl = (rt, rb, h, mat, seg) => new T.Mesh(new T.CylinderGeometry(rt, rb, h, seg || 20), mat);
-  const ball = (r, mat) => new T.Mesh(new T.SphereGeometry(r, 24, 16), mat);
+  const cyl = (rt, rb, h, mat, seg, open) => new T.Mesh(new T.CylinderGeometry(rt, rb, h, seg || 24, 1, !!open), mat);
+  const ball = (r, mat, ws, hs) => new T.Mesh(new T.SphereGeometry(r, ws || 32, hs || 24), mat);
+  const UP = new T.Vector3(0, 1, 0);
+  const V3 = (x, y, z) => new T.Vector3(x, y, z);
+  const rod = (a, b, r, mat, parent, cast) => {
+    const d = new T.Vector3().subVectors(b, a), len = d.length();
+    const m = new T.Mesh(new T.CylinderGeometry(r, r, len, 12), mat);
+    m.position.copy(a).addScaledVector(d, 0.5);
+    m.quaternion.setFromUnitVectors(UP, d.normalize());
+    return add(m, cast !== false, true, parent);
+  };
+  const at = (m, x, y, z) => { m.position.set(x, y, z); return m; };
   const by = {};
   for (const it of items) (by[it.type] = by[it.type] || []).push(it);
   const L = (t) => by[t] || [];
   const segs = buildSegs(items);
   const light = computeLight(items);
+  const metal = std('#2a2c31', { roughness: 0.4, metalness: 0.65 });
+  const alu = std('#aab0ba', { roughness: 0.3, metalness: 0.85 });
+  const blackM = std('#121316', { roughness: 0.75 });
+  const tableUnder = (x, y) => L('table').find((t) => {
+    const l = toLocal(t, x, y);
+    return t.shape === 'round' ? (l.x * l.x) / (t.w * t.w / 4) + (l.y * l.y) / (t.h * t.h / 4) <= 1 : Math.abs(l.x) <= t.w / 2 && Math.abs(l.y) <= t.h / 2;
+  });
+  // a light stand / c-stand: three legs, collar and a column up to topY
+  const stand = (x, y, topY, spread) => {
+    const sp = spread || 44, collar = Math.min(55, topY * 0.45);
+    for (let k = 0; k < 3; k++) {
+      const a = k * 2.094 + 0.5;
+      rod(V3(x, collar, y), V3(x + Math.cos(a) * sp, 1.2, y + Math.sin(a) * sp), 1.1, metal);
+      rod(V3(x, collar * 0.55, y), V3(x + Math.cos(a) * sp * 0.52, collar * 0.62 * 0.5, y + Math.sin(a) * sp * 0.52), 0.6, metal);
+      add(at(ball(1.8, blackM, 10, 8), x + Math.cos(a) * sp, 1.6, y + Math.sin(a) * sp));
+    }
+    add(at(cyl(2.4, 2.4, 6, blackM, 12), x, collar, y));
+    rod(V3(x, collar - 4, y), V3(x, Math.min(topY, collar + 70), y), 1.9, metal);
+    if (topY > collar + 70) {
+      rod(V3(x, collar + 66, y), V3(x, topY, y), 1.4, alu);
+      add(at(cyl(2.2, 2.2, 4, blackM, 12), x, collar + 68, y));
+    }
+  };
 
-  // ground and floors
-  const ground = add(new T.Mesh(new T.PlaneGeometry(30000, 30000), std('#3a404c', { roughness: 0.95 })), false, true);
+  // ---------- ground, floors, walls ----------
+  const ground = add(new T.Mesh(new T.PlaneGeometry(30000, 30000), std('#4a505c', { roughness: 0.95, map: pvTex('concrete', 256, drawConcrete, 120) })), false, true);
   ground.rotation.x = -Math.PI / 2;
+  const plank = pvTex('planks', 512, drawPlanks);
+  plank.repeat.set(1 / 220, 1 / 220);
   for (const r of findRooms(L('wall'))) {
     const shp = new T.Shape(r.pts.map(([x, y]) => new T.Vector2(x, -y)));
-    const m = add(new T.Mesh(new T.ShapeGeometry(shp), std(roomTint(r)[0], { roughness: 0.8 })), false, true);
+    const m = add(new T.Mesh(new T.ShapeGeometry(shp), std(shade(roomTint(r)[0], 0.25), { roughness: 0.6, map: plank })), false, true);
     m.rotation.x = -Math.PI / 2;
     m.position.y = 0.6;
   }
-
-  // walls with openings
   const opens = L('door').concat(L('window'));
   for (const w of L('wall')) {
     const mat = std(wallColor(w), { roughness: 0.92 });
+    const base = std(shade(wallColor(w), -0.3), { roughness: 0.6 });
     for (const pc of wallPieces(w, opens)) {
       const h = w.thick / 2;
       const ax = pc.ax - (pc.e0 ? pc.ex * h : 0), ay = pc.ay - (pc.e0 ? pc.ey * h : 0);
       const bx = pc.bx + (pc.e1 ? pc.ex * h : 0), by2 = pc.by + (pc.e1 ? pc.ey * h : 0);
       const len = dist(ax, ay, bx, by2);
       if (len < 0.5) continue;
+      const ry = -Math.atan2(pc.ey, pc.ex);
       const m = add(box(len, WALL_H, w.thick, mat));
       m.position.set((ax + bx) / 2, WALL_H / 2, (ay + by2) / 2);
-      m.rotation.y = -Math.atan2(pc.ey, pc.ex);
+      m.rotation.y = ry;
+      const bb = add(box(len, 9, w.thick + 1.4, base), false, true);
+      bb.position.set((ax + bx) / 2, 4.5, (ay + by2) / 2);
+      bb.rotation.y = ry;
     }
   }
   for (const o of opens) {
     const t = o.thick || 15, rot = -o.rot * D2R;
     const mat = std('#e9edf5', { roughness: 0.92 });
+    const frameM = std('#f4f6f9', { roughness: 0.5 });
     const top = o.type === 'door' ? 210 : 220;
-    const lintel = add(box(o.w, WALL_H - top, t, mat));
-    lintel.position.set(o.x, (WALL_H + top) / 2, o.y);
-    lintel.rotation.y = rot;
+    const g = new T.Group();
+    g.position.set(o.x, 0, o.y);
+    g.rotation.y = rot;
+    sc.add(g);
+    add(at(box(o.w, WALL_H - top, t, mat), 0, (WALL_H + top) / 2, 0), true, true, g);
     if (o.type === 'window') {
-      const sill = add(box(o.w, 90, t, mat));
-      sill.position.set(o.x, 45, o.y);
-      sill.rotation.y = rot;
-      const glass = add(new T.Mesh(new T.PlaneGeometry(o.w, 130), std('#a9dcff', { transparent: true, opacity: 0.22, roughness: 0.05, side: T.DoubleSide, emissive: '#3a6f99', emissiveIntensity: 0.25 })), false, false);
-      glass.position.set(o.x, 155, o.y);
-      glass.rotation.y = rot;
+      add(at(box(o.w, 90, t, mat), 0, 45, 0), true, true, g);
+      add(at(box(o.w + 6, 3, t + 6, frameM), 0, 91.5, 0), true, true, g);
+      for (const [w2, h2, x, y] of [[o.w, 4, 0, 92], [o.w, 4, 0, 218], [4, 130, -o.w / 2 + 2, 155], [4, 130, o.w / 2 - 2, 155], [3, 126, 0, 155], [o.w, 3, 0, 160]]) add(at(box(w2, h2, 5, frameM), x, y, 0), true, true, g);
+      const glass = add(new T.Mesh(new T.PlaneGeometry(o.w, 126), std('#a9dcff', { transparent: true, opacity: 0.18, roughness: 0.05, metalness: 0.2, side: T.DoubleSide, emissive: '#3a6f99', emissiveIntensity: 0.25 })), false, false, g);
+      glass.position.set(0, 155, 0);
     } else {
+      for (const s of [-1, 1]) add(at(box(5, top, t + 2, frameM), s * (o.w / 2 - 2.5), top / 2, 0), true, true, g);
+      add(at(box(o.w, 5, t + 2, frameM), 0, top - 2.5, 0), true, true, g);
       const sg = o.swap ? -1 : 1, hx = o.flip ? o.w / 2 : -o.w / 2;
-      const c = fromLocal(o, hx, sg * (t / 2 + o.w / 2));
-      const leaf = add(box(o.w, 205, 4, std('#d9dee7', { roughness: 0.6 })));
-      leaf.position.set(c.x, 102.5, c.y);
-      leaf.rotation.y = -(o.rot + 90) * D2R;
+      const dirx = o.flip ? -1 : 1;
+      const leafG = new T.Group();
+      leafG.position.set(hx, 0, sg * t / 2);
+      leafG.rotation.y = -dirx * sg * Math.PI / 2;
+      g.add(leafG);
+      add(at(box(o.w - 4, 204, 4, std('#dfe3ea', { roughness: 0.55 })), dirx * (o.w / 2 - 2), 102, 0), true, true, leafG);
+      for (const s of [-1, 1]) {
+        add(at(cyl(1.4, 1.4, 4, alu, 10), dirx * (o.w - 10), 100, s * 3), true, true, leafG).rotation.x = Math.PI / 2;
+        add(at(box(10, 1.6, 1.6, alu), dirx * (o.w - 14), 100, s * 5), true, true, leafG);
+      }
     }
   }
 
-  // tables
+  // ---------- tables ----------
   for (const it of L('table')) {
     const g = new T.Group();
-    const wood = std(it.color, { roughness: 0.55 });
-    const top = it.shape === 'round' ? add(cyl(it.w / 2, it.w / 2, 4, wood, 40), true, true, g) : add(box(it.w, 4, it.h, wood), true, true, g);
-    if (it.shape === 'round') top.scale.z = it.h / it.w;
-    top.position.y = 74;
-    const legMat = std(shade(it.color, -0.4), { roughness: 0.5 });
-    const legs = it.shape === 'round' ? [[0, 0]] : [[-1, -1], [1, -1], [1, 1], [-1, 1]].map(([u, v]) => [u * (it.w / 2 - 6), v * (it.h / 2 - 6)]);
-    for (const [lx, lz] of legs) { const l = add(cyl(it.shape === 'round' ? 5 : 2.5, it.shape === 'round' ? 9 : 2.5, 72, legMat), true, true, g); l.position.set(lx, 36, lz); }
+    const wood = std(it.color, { roughness: 0.45 });
+    const legM = std(shade(it.color, -0.45), { roughness: 0.5, metalness: 0.2 });
+    if (it.shape === 'round') {
+      const top = add(at(cyl(it.w / 2, it.w / 2 - 1, 3.5, wood, 48), 0, 74, 0), true, true, g);
+      top.scale.z = it.h / it.w;
+      add(at(cyl(4, 5, 70, legM, 16), 0, 38, 0), true, true, g);
+      add(at(cyl(it.w * 0.22, it.w * 0.24, 2.5, legM, 32), 0, 1.3, 0), true, true, g);
+    } else {
+      add(at(box(it.w, 3.5, it.h, wood), 0, 74, 0), true, true, g);
+      add(at(box(it.w - 10, 7, it.h - 10, wood), 0, 68.5, 0), true, true, g);
+      for (const [u, v] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) add(at(cyl(2.4, 1.8, 70, legM, 12), u * (it.w / 2 - 6), 35, v * (it.h / 2 - 6)), true, true, g);
+    }
     g.position.set(it.x, 0, it.y);
     g.rotation.y = -it.rot * D2R;
     sc.add(g);
   }
 
-  // people
-  const skin = std('#e7b894', { roughness: 0.55 }), hairM = std('#3b2a1e', { roughness: 0.7 }), pants = std('#2b303b', { roughness: 0.8 });
-  for (const it of L('person')) {
+  // ---------- people ----------
+  for (const it of L('person')) sc.add(personModel(it));
+  function personModel(it) {
     const g = new T.Group(), s = it.size || 1;
-    const cloth = std(it.color, { roughness: 0.75 });
-    for (const z of [-9, 9]) { const leg = add(cyl(7, 6, 86, pants), true, true, g); leg.position.set(0, 43, z); }
-    const torso = add(cyl(19, 15, 58, cloth, 28), true, true, g); torso.position.y = 116; torso.scale.x = 0.58;
-    const sh = add(ball(19, cloth), true, true, g); sh.position.y = 142; sh.scale.set(0.58, 0.42, 1.05);
-    for (const z of [-23, 23]) { const arm = add(cyl(5.5, 4.5, 62, cloth), true, true, g); arm.position.set(0, 112, z); const hand = add(ball(4.5, skin), true, true, g); hand.position.set(0, 79, z); }
-    const neck = add(cyl(5.5, 6, 12, skin), true, true, g); neck.position.y = 150;
-    const head = add(ball(11.5, skin), true, true, g); head.position.y = 164; head.scale.set(1.05, 1.18, 0.95);
-    const hair = add(new T.Mesh(new T.SphereGeometry(12.6, 24, 16, Math.PI * 1.5, Math.PI, 0, Math.PI * 0.62), hairM), true, true, g);
-    hair.position.set(-1, 166, 0); hair.scale.set(1.05, 1.15, 0.98);
-    const cap = add(new T.Mesh(new T.SphereGeometry(12.4, 24, 16, 0, Math.PI * 2, 0, Math.PI * 0.32), hairM), true, true, g);
-    cap.position.set(-0.5, 166, 0); cap.scale.set(1.05, 1.15, 0.98);
-    const nose = add(new T.Mesh(new T.ConeGeometry(2.2, 6, 12), skin), true, true, g); nose.rotation.z = -Math.PI / 2; nose.position.set(12.5, 163, 0);
-    const eyeM = std('#1b1b1f', { roughness: 0.3 });
-    for (const z of [-4.2, 4.2]) { const e = add(ball(1.5, eyeM), false, true, g); e.position.set(10.6, 167, z); }
+    const skinC = it.skin || '#e0ac8a';
+    const skin = new T.MeshStandardMaterial({ color: skinC, roughness: 0.5 });
+    const cloth = std(it.color, { roughness: 0.8 });
+    const pants = std(it.pants || '#2b303b', { roughness: 0.85 });
+    const shoe = std('#1a1b1f', { roughness: 0.45 });
+    const hairM = std(it.hair || '#3b2a1e', { roughness: 0.65 });
+    const lipM = std(shade(skinC, -0.18), { roughness: 0.4, color: new T.Color(skinC).lerp(new T.Color('#b65a5a'), 0.45) });
+    const P = (m, x, y, z) => add(at(m, x, y, z), true, true, g);
+    const limb = (a, b, r1, r2, mat) => {
+      const d = new T.Vector3().subVectors(b, a), len = d.length();
+      const m = new T.Mesh(new T.CylinderGeometry(r2, r1, len, 18), mat);
+      m.position.copy(a).addScaledVector(d, 0.5);
+      m.quaternion.setFromUnitVectors(UP, d.normalize());
+      return add(m, true, true, g);
+    };
+    for (const z of [-9, 9]) {
+      P(ball(5, shoe), 4, 4, z).scale.set(2.5, 0.85, 1.15);
+      limb(V3(0, 7, z), V3(0, 48, z), 4.6, 5.8, pants);
+      P(ball(5.8, pants, 20, 14), 0.5, 49, z);
+      limb(V3(0.5, 49, z), V3(0, 92, z * 0.9), 6.2, 8.4, pants);
+    }
+    P(ball(15, pants), 0, 95, 0).scale.set(0.66, 0.55, 1.08);
+    const prof = [[0, 92], [13.6, 93], [14.6, 100], [14.2, 108], [15.6, 118], [17.6, 128], [18.6, 136], [17.6, 142], [13, 147], [6, 150], [0, 150.5]].map(([r, y]) => new T.Vector2(r, y));
+    const torso = P(new T.Mesh(new T.LatheGeometry(prof, 40), cloth), 0, 0, 0);
+    torso.scale.x = 0.62;
+    for (const z of [-1, 1]) {
+      P(ball(5.8, cloth, 20, 14), 0, 141.5, z * 16.2).scale.set(1, 0.85, 1);
+      limb(V3(0, 141, z * 18.6), V3(2, 113, z * 20.2), 4.9, 4.3, cloth);
+      P(ball(4.3, cloth, 16, 12), 2, 113, z * 20.2);
+      limb(V3(2, 113, z * 20.2), V3(9, 90, z * 18.6), 4.1, 3.4, cloth);
+      P(ball(3.6, skin, 16, 12), 10.6, 85, z * 18.2).scale.set(1.3, 1.9, 0.8);
+    }
+    limb(V3(0, 146, 0), V3(0.9, 157, 0), 5.2, 4.6, skin);
+    const head = new T.Group();
+    head.position.set(1.2, 164.5, 0);
+    g.add(head);
+    const H = (m, x, y, z, cast) => add(at(m, x, y, z), cast !== false, true, head);
+    const SX = 10, SY = 12, SZ = 8.6;
+    H(new T.Mesh(sculptHead(skinC, it.hair || '#3b2a1e'), new T.MeshStandardMaterial({ color: '#ffffff', vertexColors: true, roughness: 0.55 })), 0, 0, 0);
+    const eyeW = std('#f4f1ea', { roughness: 0.12 }), irisM = std(it.eyes || '#5a3d26', { roughness: 0.2 }), pupM = std('#050505', { roughness: 0.05 });
+    for (const z of [-1, 1]) {
+      const u = 0.31 * z, v = 0.12, fx = Math.sqrt(Math.max(0, 1 - u * u - v * v));
+      const ex = fx * SX * 0.925 - 0.78, ey = v * SY, ez = u * SZ;
+      H(ball(1.22, eyeW, 20, 16), ex, ey, ez, false);
+      H(ball(0.8, irisM, 18, 14), ex + 0.86, ey, ez, false).scale.set(0.45, 1, 1);
+      H(ball(0.36, pupM, 12, 10), ex + 1.17, ey, ez, false).scale.set(0.4, 1, 1);
+      const lid = H(new T.Mesh(new T.SphereGeometry(1.3, 20, 12, 0, Math.PI * 2, 0, Math.PI * 0.36), skin), ex, ey + 0.04, ez, false);
+      lid.rotation.z = -0.55;
+      H(ball(2.4, skin, 16, 12), -0.6, 0.2, z * (SZ + 0.3)).scale.set(0.6, 1.3, 0.5);
+    }
+    H(new T.Mesh(sculptHair(), hairM), -0.3, 0.3, 0);
     g.scale.setScalar(s);
     g.position.set(it.x, 0, it.y);
     g.rotation.y = -it.rot * D2R;
-    sc.add(g);
+    return g;
   }
 
-  // light shaping panels
+  // ---------- light shaping: frames on stands ----------
   const glow = light.glow || {};
-  for (const it of L('bounce').concat(L('mirror'), L('diffusion'), L('flag'))) {
-    const dims = { bounce: [120, 100], mirror: [90, 110], diffusion: [130, 125], flag: [90, 145] }[it.type];
+  for (const it of L('bounce').concat(L('mirror'), L('diffusion'), L('flag'), L('negfill'))) {
+    const dims = { bounce: [120, 100], mirror: [90, 115], diffusion: [130, 125], flag: [90, 150], negfill: [180, 105] }[it.type];
     const gl = glow[it.id];
     let mat;
     if (it.type === 'bounce') {
       const c = { white: '#f7f8fa', silver: '#d9e0e8', gold: '#f2c55a' }[it.surface] || '#f7f8fa';
-      mat = std(c, { roughness: it.surface === 'white' ? 0.9 : 0.35, metalness: it.surface === 'white' ? 0 : 0.35 });
-    } else if (it.type === 'mirror') {
-      mat = new T.MeshPhongMaterial({ color: '#cfe0f2', specular: '#ffffff', shininess: 300 });
-    } else if (it.type === 'diffusion') {
-      mat = std('#f5f7fb', { transparent: true, opacity: 0.6, roughness: 1, side: T.DoubleSide });
-    } else {
-      mat = std('#0c0e12', { roughness: 0.95 });
-    }
-    if (gl && it.type !== 'flag' && it.type !== 'mirror') { mat.emissive = new T.Color(rgba(gl.rgb, 1)); mat.emissiveIntensity = clamp(gl.I * 0.5, 0, 0.6); }
-    const m = add(box(it.w, dims[0], it.type === 'flag' ? 2 : 3, mat), it.type !== 'mirror', true);
-    m.position.set(it.x, dims[1], it.y);
-    m.rotation.y = -it.rot * D2R;
-    const standM = std('#3b3f47', { roughness: 0.5, metalness: 0.4 });
-    const st = add(cyl(1.5, 1.5, dims[1] - dims[0] / 2, standM), true, true);
-    st.position.set(it.x, (dims[1] - dims[0] / 2) / 2, it.y);
+      mat = std(c, { roughness: it.surface === 'white' ? 0.95 : 0.35, metalness: it.surface === 'white' ? 0 : 0.4 });
+    } else if (it.type === 'mirror') mat = new T.MeshPhongMaterial({ color: '#cfe0f2', specular: '#ffffff', shininess: 300 });
+    else if (it.type === 'diffusion') mat = std('#f5f7fb', { transparent: true, opacity: 0.6, roughness: 1, side: T.DoubleSide });
+    else mat = std(it.type === 'negfill' ? '#050506' : '#0c0e12', { roughness: 1 });
+    if (gl && (it.type === 'bounce' || it.type === 'diffusion')) { mat.emissive = new T.Color(rgba(gl.rgb, 1)); mat.emissiveIntensity = clamp(gl.I * 0.5, 0, 0.6); }
+    const g = new T.Group();
+    g.position.set(it.x, dims[1], it.y);
+    g.rotation.y = -it.rot * D2R;
+    sc.add(g);
+    add(box(it.w, dims[0], it.type === 'flag' || it.type === 'negfill' ? 2 : 2.5, mat), it.type !== 'mirror', true, g);
+    const fr = it.type === 'mirror' ? std('#3a3d44', { metalness: 0.6, roughness: 0.35 }) : alu;
+    for (const [w2, h2, x, y] of [[it.w + 3, 2.4, 0, dims[0] / 2], [it.w + 3, 2.4, 0, -dims[0] / 2], [2.4, dims[0], -it.w / 2, 0], [2.4, dims[0], it.w / 2, 0]]) add(at(box(w2, h2, 3, fr), x, y, 0), true, true, g);
+    stand(it.x, it.y, dims[1] - dims[0] / 2, 38);
   }
 
-  // lights
-  sc.add(new T.HemisphereLight('#aeb8cc', '#2a2e36', 0.13));
-  let shadows = 0;
-  const spot = (x, y, h, tx, ty, th, rgb, I, angle, pen, range, wantShadow) => {
-    const s = new T.SpotLight(new T.Color(rgba(rgb, 1)), I, range, clamp(angle, 2 * D2R, 85 * D2R), pen, 1);
-    s.position.set(x, h, y);
-    s.target.position.set(tx, th, ty);
-    if (wantShadow && shadows < 5) {
-      shadows++;
+  // ---------- lights ----------
+  sc.add(new T.HemisphereLight('#aeb8cc', '#2a2e36', 0.16));
+  let spotShadows = 0, pointShadows = 0;
+  const spot = (pos, tgt, rgb, I, angle, pen, range, wantShadow, mapSize) => {
+    const s = new T.SpotLight(new T.Color(rgba(rgb, 1)), I, range, clamp(angle, 1.5 * D2R, 85 * D2R), pen, 1);
+    s.position.copy(pos);
+    s.target.position.copy(tgt);
+    if (wantShadow && spotShadows < 5) {
+      spotShadows++;
       s.castShadow = true;
-      s.shadow.mapSize.set(1024, 1024);
-      s.shadow.camera.near = 10;
+      s.shadow.mapSize.set(mapSize || 1024, mapSize || 1024);
+      s.shadow.camera.near = 0.5;
       s.shadow.camera.far = range;
       s.shadow.bias = -0.0006;
     }
     sc.add(s); sc.add(s.target);
     return s;
   };
-  const point = (x, y, h, rgb, I, range) => { const p = new T.PointLight(new T.Color(rgba(rgb, 1)), I, range, 1.6); p.position.set(x, h, y); sc.add(p); };
-  for (const it of L('lamp')) {
+  const point = (pos, rgb, I, range, decay, wantShadow) => {
+    const p = new T.PointLight(new T.Color(rgba(rgb, 1)), I, range, decay == null ? 1.6 : decay);
+    p.position.copy(pos);
+    if (wantShadow && pointShadows < 2) { pointShadows++; p.castShadow = true; p.shadow.mapSize.set(512, 512); p.shadow.camera.near = 2; p.shadow.bias = -0.002; }
+    sc.add(p);
+    return p;
+  };
+  const lamps = L('lamp').slice().sort((a, b) => (b.kind === 'gobo') - (a.kind === 'gobo'));
+  for (const it of lamps) {
     const on = it.on && it.intensity > 0, rgb = lampRgb(it), I = it.intensity / 100;
-    const h = it.height || (it.kind === 'softbox' ? 170 : 190);
+    const lit = on ? new T.Color(rgba(rgb.map((v) => lerp(v, 255, 0.6)), 1)) : new T.Color('#4d525c');
     const a = it.rot * D2R, dx = Math.cos(a), dy = Math.sin(a);
+    if (it.kind === 'practical') { practical(it, on, rgb, I, lit); continue; }
+    const omni = lampOmni(it);
+    const h = lampHeight(it);
     const reach = clamp(it.range * 0.45, 150, 520);
-    const tilt = Math.atan2(h - 140, reach);
-    // fixture
-    const g = new T.Group();
-    const dark = std('#24262c', { roughness: 0.5, metalness: 0.3 });
-    const standH = h - 12;
-    const st = add(cyl(1.6, 1.6, standH, dark), true, true); st.position.set(it.x, standH / 2, it.y);
-    for (let k = 0; k < 3; k++) { const leg = add(cyl(1.2, 1.2, 50, dark), true, true); const la = k * 2.094; leg.position.set(it.x + Math.cos(la) * 16, 14, it.y + Math.sin(la) * 16); leg.rotation.set(Math.sin(la) * 0.9, 0, -Math.cos(la) * 0.9); }
-    const sizes = { fresnel: [30, 24, 24], led: [10, 40, 40], softbox: [36, 54, 54] }[it.kind] || [30, 24, 24];
-    add(box(sizes[0], sizes[1], sizes[2], dark), true, true, g);
-    const face = new T.Mesh(new T.PlaneGeometry(sizes[2] * 0.85, sizes[1] * 0.85), new T.MeshBasicMaterial({ color: on ? new T.Color(rgba(rgb.map((v) => lerp(v, 255, 0.6)), 1)) : new T.Color('#555b66') }));
-    face.position.x = sizes[0] / 2 + 0.3;
-    face.rotation.y = Math.PI / 2;
-    g.add(face);
-    g.position.set(it.x, h, it.y);
-    g.rotation.order = 'YZX';
-    g.rotation.y = -a;
-    g.rotation.z = -tilt;
-    sc.add(g);
+    const tilt = omni ? 0 : Math.atan2(h - 140, reach);
+    const pan = new T.Group(); pan.position.set(it.x, h, it.y); pan.rotation.y = -a; sc.add(pan);
+    const tg = new T.Group(); tg.rotation.z = -tilt; pan.add(tg);
+    const yokeR = it.kind === 'led' ? 18 : it.kind === 'gobo' ? 15.5 : 19;
+    if (!(it.kind === 'cob' && it.mod === 'lantern')) {
+      for (const z of [-1, 1]) {
+        add(at(box(5, 26, 1.8, metal), 0, -12, z * yokeR), true, true, pan);
+        add(at(cyl(3, 3, 3.4, blackM, 16), 0, 0, z * (yokeR + 1.6)), true, true, pan).rotation.x = Math.PI / 2;
+      }
+      add(at(box(5, 2.4, yokeR * 2 + 2, metal), 0, -25, 0), true, true, pan);
+    }
+    stand(it.x, it.y, h - 26);
+    let F = 0;
+    const H = (m, x, y, z, rx, ry, rz) => { m.position.set(x, y, z); if (rx) m.rotation.x = rx; if (ry) m.rotation.y = ry; if (rz) m.rotation.z = rz; return add(m, false, true, tg); };
+    if (it.kind === 'led') {
+      H(box(4, 30, 30, metal), 0, 0, 0);
+      H(box(3, 32, 32, blackM), -2.5, 0, 0);
+      H(new T.Mesh(new T.PlaneGeometry(28, 28), new T.MeshBasicMaterial({ color: lit, map: pvTex('led', 256, drawLedGrid), toneMapped: false })), 2.1, 0, 0, 0, Math.PI / 2);
+      F = 3;
+    } else if (it.kind === 'gobo') {
+      H(ball(13, metal), -16, 0, 0).scale.set(1.25, 1, 1);
+      H(cyl(10, 10, 18, metal, 28), -1, 0, 0, 0, 0, Math.PI / 2);
+      H(cyl(8.5, 8.5, 16, metal, 28), 16, 0, 0, 0, 0, Math.PI / 2);
+      H(cyl(7.6, 7.6, 10, blackM, 28), 29, 0, 0, 0, 0, Math.PI / 2);
+      H(box(1.6, 22, 22, std('#b8892f', { metalness: 0.7, roughness: 0.35 })), 8, 0, 0); // gobo holder
+      for (const [y, z] of [[11.5, 0], [-11.5, 0], [0, 11.5], [0, -11.5]]) H(box(2, 3, 3, alu), 4, y, z);
+      H(new T.Mesh(new T.CircleGeometry(6.6, 28), glowM(lit)), 34.2, 0, 0, 0, Math.PI / 2);
+      F = 35;
+    } else {
+      // COB body with cooling fins, rear fan, handle and Bowens mount
+      H(cyl(12.5, 12.5, 24, metal, 32), -6, 0, 0, 0, 0, Math.PI / 2);
+      for (let i = 0; i < 7; i++) H(cyl(14.5, 14.5, 0.9, metal, 32), -17 + i * 2.2, 0, 0, 0, 0, Math.PI / 2);
+      H(cyl(11, 11, 2, blackM, 32), -19.5, 0, 0, 0, 0, Math.PI / 2);
+      for (const r of [3.5, 6.5, 9]) H(new T.Mesh(new T.TorusGeometry(r, 0.4, 6, 32), alu), -20.7, 0, 0, 0, Math.PI / 2);
+      H(new T.Mesh(new T.TorusGeometry(7, 1.1, 10, 24, Math.PI), blackM), -6, 12.5, 0);
+      H(cyl(10, 10, 4, alu, 32), 8, 0, 0, 0, 0, Math.PI / 2);
+      const mod = it.mod || 'reflector';
+      if (mod === 'reflector') {
+        H(new T.Mesh(new T.CylinderGeometry(19, 9.5, 18, 40, 1, true), std('#d7dce4', { metalness: 0.9, roughness: 0.22, side: T.DoubleSide })), 19, 0, 0, 0, 0, -Math.PI / 2);
+        H(new T.Mesh(new T.CircleGeometry(5, 24), glowM(lit)), 10.6, 0, 0, 0, Math.PI / 2);
+        F = 28;
+      } else if (mod === 'fresnel') {
+        H(cyl(17, 17, 18, metal, 40), 19, 0, 0, 0, 0, Math.PI / 2);
+        H(new T.Mesh(new T.CircleGeometry(14.5, 40), glowM(lit.clone().multiplyScalar(0.9))), 28.2, 0, 0, 0, Math.PI / 2);
+        for (const r of [3.5, 6.5, 9.5, 12.5]) H(new T.Mesh(new T.TorusGeometry(r, 0.3, 6, 40), std('#ffffff', { transparent: true, opacity: 0.35, roughness: 0.1 })), 28.4, 0, 0, 0, Math.PI / 2);
+        H(new T.Mesh(new T.TorusGeometry(15.5, 1.2, 10, 40), alu), 28.3, 0, 0, 0, Math.PI / 2);
+        F = 29;
+      } else if (mod === 'softbox') {
+        H(cyl(11, 11, 3, alu, 32), 11.5, 0, 0, 0, 0, Math.PI / 2);
+        const fg = new T.CylinderGeometry(42, 9, 46, 4, 1, true);
+        fg.rotateY(Math.PI / 4);
+        H(new T.Mesh(fg, std('#18191c', { roughness: 0.95, side: T.DoubleSide })), 36, 0, 0, 0, 0, -Math.PI / 2);
+        H(new T.Mesh(new T.PlaneGeometry(59, 59), glowM(lit.clone().multiplyScalar(0.85))), 59.2, 0, 0, 0, Math.PI / 2);
+        for (const [w2, h2, y, z] of [[60, 1.4, 29.8, 0], [60, 1.4, -29.8, 0]]) H(box(1.4, h2, w2, blackM), 59.4, y, z);
+        for (const z of [29.8, -29.8]) H(box(1.4, 60, 1.4, blackM), 59.4, 0, z);
+        if (it.grid) {
+          const gm = std('#0d0d10', { roughness: 1, side: T.DoubleSide });
+          for (let i = 1; i < 6; i++) {
+            const o = -29.5 + (i * 59) / 6;
+            H(box(7, 59, 0.5, gm), 63, 0, o);
+            H(box(7, 0.5, 59, gm), 63, o, 0);
+          }
+        }
+        F = 60;
+      } else {
+        H(new T.Mesh(new T.SphereGeometry(28, 40, 28), new T.MeshStandardMaterial({ color: '#fff7ea', emissive: lit, emissiveIntensity: on ? 1.1 : 0, roughness: 1 })), 38, 0, 0);
+        for (let k = -3; k <= 3; k++) { const rr = Math.sqrt(28 * 28 - (k * 8) * (k * 8)) + 0.2; H(new T.Mesh(new T.TorusGeometry(rr, 0.35, 6, 40), std('#d8cfbf')), 38 + k * 8, 0, 0, 0, Math.PI / 2); }
+        F = 38;
+      }
+      if (it.barndoors && (mod === 'reflector' || mod === 'fresnel')) {
+        const R = mod === 'fresnel' ? 17 : 19.5, fx = mod === 'fresnel' ? 29 : 28.5;
+        H(new T.Mesh(new T.TorusGeometry(R + 0.5, 1.4, 8, 40), metal), fx, 0, 0, 0, Math.PI / 2);
+        const half = clamp((it.doors || 45) / 2, 4, 85) * D2R;
+        for (const s of [-1, 1]) {
+          const side = new T.Group(); side.position.set(fx, 0, s * R); side.rotation.y = -s * half; tg.add(side);
+          add(at(box(R * 1.05, R * 1.8, 0.6, blackM), R * 0.52, 0, 0), false, true, side);
+          const tb = new T.Group(); tb.position.set(fx, s * R, 0); tb.rotation.z = s * 0.95; tg.add(tb);
+          add(at(box(R * 1.25, 0.6, R * 2, blackM), R * 0.62, 0, 0), false, true, tb);
+        }
+      }
+    }
+    // control box and cable on the stand
+    if (it.kind !== 'led') {
+      add(at(box(9, 20, 15, std('#1f2025', { roughness: 0.5, metalness: 0.3 })), it.x - dx * 6, 100, it.y - dy * 6));
+      const back = V3(it.x - dx * 20 * Math.cos(tilt), h + 20 * Math.sin(tilt), it.y - dy * 20 * Math.cos(tilt));
+      const curve = new T.CatmullRomCurve3([V3(it.x - dx * 6, 108, it.y - dy * 6), V3(it.x - dx * 26, 130, it.y - dy * 26), V3(back.x - dx * 6, (back.y + 130) / 2, back.z - dy * 6), back]);
+      add(new T.Mesh(new T.TubeGeometry(curve, 24, 0.55, 6), blackM), false, true);
+    }
     if (!on) continue;
-    const pen = it.kind === 'softbox' ? 1 : it.kind === 'led' ? 0.75 : 0.35;
-    const power = (it.kind === 'softbox' ? 2.6 : it.kind === 'led' ? 2.9 : 3.4) * I;
-    const fx = it.x + dx * sizes[0] / 2, fy = it.y + dy * sizes[0] / 2;
-    spot(fx, fy, h, it.x + dx * reach, it.y + dy * reach, 140, rgb, power, (it.beam / 2) * D2R, pen, it.range * 1.6, true);
+    const dir3 = V3(Math.cos(a) * Math.cos(tilt), -Math.sin(tilt), Math.sin(a) * Math.cos(tilt));
+    const pos = V3(it.x, h, it.y).addScaledVector(dir3, F + 0.5);
+    if (omni) { point(pos, rgb, I * 1.7, it.range * 1.4, 1.4, true); continue; }
+    const tgt = V3(it.x + dx * reach, 140, it.y + dy * reach);
+    const beam = effBeam(it);
+    const pen = it.kind === 'gobo' ? 0.08 : it.kind === 'led' ? 0.75 : it.mod === 'softbox' ? (it.grid ? 0.7 : 1) : it.mod === 'fresnel' ? 0.3 : 0.45;
+    const power = (it.kind === 'gobo' ? 4.2 : it.kind === 'led' ? 2.9 : it.mod === 'softbox' ? 2.6 : it.mod === 'fresnel' ? 3.6 : 3.2) * I;
+    const sp = spot(pos, tgt, rgb, power, (beam / 2) * D2R, pen, it.range * 1.6, true, it.kind === 'gobo' ? 2048 : 1024);
+    if (it.kind === 'gobo' && sp.castShadow) {
+      // a cut-out disc in front of the lens: its shadow is the gobo pattern
+      const tex = new T.CanvasTexture(goboCanvas(it.gobo || 'window', 256, 'alpha', 0));
+      const size = 2 * 2.5 * Math.tan((beam / 2) * D2R) * 1.5 + 0.2;
+      const gp = new T.Mesh(new T.PlaneGeometry(size, size), new T.MeshBasicMaterial({ colorWrite: false, depthWrite: false, side: T.DoubleSide }));
+      gp.customDepthMaterial = new T.MeshDepthMaterial({ depthPacking: T.RGBADepthPacking, alphaMap: tex, alphaTest: 0.5, side: T.DoubleSide });
+      gp.position.copy(pos).addScaledVector(dir3, 2.5);
+      gp.lookAt(tgt);
+      gp.rotateZ((it.goboRot || 0) * D2R);
+      gp.castShadow = true;
+      gp.receiveShadow = false;
+      sc.add(gp);
+    }
     // mirrors and walls struck by the beam
     const n = 9, hitsM = new Map();
     let wallHit = null;
+    const fx = it.x + dx * F, fy = it.y + dy * F;
     for (let j = 0; j < n; j++) {
-      const ang = a + (j / (n - 1) - 0.5) * it.beam * D2R;
+      const ang = a + (j / (n - 1) - 0.5) * beam * D2R;
       const hit = castRay(segs, fx, fy, Math.cos(ang), Math.sin(ang), it.range, null);
       if (!hit) continue;
       if (hit.s.kind === 'mirror') hitsM.set(hit.s.item, (hitsM.get(hit.s.item) || 0) + 1);
@@ -4100,34 +4771,100 @@ function pvBuild(items, camIt) {
     for (const [m, cnt] of hitsM) {
       const e = panelEnds(m), ex = e[2] - e[0], ey = e[3] - e[1], ln = Math.hypot(ex, ey), nx = -ey / ln, ny = ex / ln;
       const refl = (px, py) => { const d = (px - e[0]) * nx + (py - e[1]) * ny; return [px - 2 * d * nx, py - 2 * d * ny]; };
-      const [vx, vy] = refl(fx, fy), [tx, ty] = refl(it.x + dx * reach, it.y + dy * reach);
-      spot(vx, vy, h, tx, ty, 140, rgb, power * ((m.reflect || 90) / 100) * (cnt / n), (it.beam / 2) * D2R, pen, it.range * 1.6, false);
+      const [vx, vy] = refl(pos.x, pos.z), [tx, ty] = refl(tgt.x, tgt.z);
+      spot(V3(vx, pos.y, vy), V3(tx, 140, ty), rgb, power * ((m.reflect || 90) / 100) * (cnt / n), (beam / 2) * D2R, pen, it.range * 1.6, false);
     }
     if (wallHit) {
       const t = wallHit.t, k = 1 - t / it.range;
       const wc = wallHit.s.item.type === 'wall' ? hexToRgb(wallColor(wallHit.s.item)) : [180, 180, 180];
-      const bounceRgb = rgb.map((v, i) => (v * wc[i]) / 255);
-      point(fx + dx * (t - 30), fy + dy * (t - 30), 140, bounceRgb, 0.55 * I * k, 520);
+      point(V3(fx + dx * (t - 30), 140, fy + dy * (t - 30)), rgb.map((v, i) => (v * wc[i]) / 255), 0.55 * I * k, 520);
     }
+  }
+  function practical(it, on, rgb, I, lit) {
+    const p = it.prac || 'bulb';
+    const brass = std('#b08d57', { metalness: 0.8, roughness: 0.3 });
+    const fabric = (op) => new T.MeshStandardMaterial({ color: '#efe6d5', emissive: lit, emissiveIntensity: on ? op : 0, roughness: 1, side: T.DoubleSide });
+    const tb = tableUnder(it.x, it.y), base = tb ? 76 : 0;
+    let lp;
+    if (p === 'bulb') {
+      const h = lampHeight(it);
+      rod(V3(it.x, h + 90, it.y), V3(it.x, h + 7, it.y), 0.35, blackM);
+      add(at(cyl(1.7, 1.7, 4.5, blackM, 16), it.x, h + 5.2, it.y), false, true);
+      add(at(ball(4.3, glowM(lit)), it.x, h, it.y), false, false).scale.set(1, 1.25, 1);
+      lp = V3(it.x, h, it.y);
+    } else if (p === 'tablelamp') {
+      add(at(cyl(9, 10, 2.5, std('#ece6dc', { roughness: 0.4 }), 32), it.x, base + 1.25, it.y));
+      const prof = [[0, 0], [8, 0], [10.5, 6], [11, 14], [7, 22], [3, 27], [2.5, 32], [0, 32]].map(([r, y]) => new T.Vector2(r, y));
+      add(at(new T.Mesh(new T.LatheGeometry(prof, 32), std('#c9b79c', { roughness: 0.3 })), it.x, base + 2.5, it.y));
+      rod(V3(it.x, base + 34, it.y), V3(it.x, base + 41, it.y), 0.5, brass);
+      add(at(ball(3, glowM(lit)), it.x, base + 41, it.y), false, false);
+      add(at(cyl(11, 17, 20, fabric(0.6), 40, true), it.x, base + 45, it.y), false, true);
+      lp = V3(it.x, base + 41, it.y);
+    } else if (p === 'floorlamp') {
+      add(at(cyl(15, 16, 3, metal, 32), it.x, 1.5, it.y));
+      rod(V3(it.x, 3, it.y), V3(it.x, 152, it.y), 1.3, brass);
+      add(at(ball(3.2, glowM(lit)), it.x, 154, it.y), false, false);
+      add(at(cyl(14, 21, 25, fabric(0.6), 40, true), it.x, 160, it.y), false, true);
+      lp = V3(it.x, 155, it.y);
+    } else if (p === 'tube') {
+      const h = lampHeight(it), g = new T.Group();
+      g.position.set(it.x, h, it.y); g.rotation.y = -it.rot * D2R; sc.add(g);
+      add(at(cyl(1.7, 1.7, 120, glowM(lit), 16), 0, 0, 0), false, false, g).rotation.x = Math.PI / 2;
+      for (const z of [-61, 61]) add(at(box(4, 4, 3, blackM), 0, 0, z), true, true, g);
+      if (on) for (const z of [-35, 35]) { const w = fromLocal(it, 0, z); point(V3(w.x, h, w.y), rgb, I * 0.9, it.range * 1.3, 1.5, false); }
+      return;
+    } else {
+      add(at(cyl(4.5, 5.5, 1.5, brass, 24), it.x, base + 0.8, it.y));
+      add(at(cyl(2.6, 2.6, 13, std('#f3ead7', { roughness: 0.6 }), 20), it.x, base + 8, it.y));
+      add(at(ball(1.4, glowM(new T.Color('#ffb347').lerp(lit, 0.3)), 12, 10), it.x, base + 17, it.y), false, false).scale.set(1, 2.4, 1);
+      lp = V3(it.x, base + 18, it.y);
+    }
+    if (on) point(lp, rgb, I * ({ bulb: 1.6, tablelamp: 1.3, floorlamp: 1.5, candle: 0.9 }[p] || 1.4), it.range * 1.4, 1.5, p !== 'candle');
   }
   // soft secondary light from lit bounce boards and diffusion frames
   for (const it of L('bounce').concat(L('diffusion'))) {
     const gl = glow[it.id];
     if (!gl || gl.nx == null) continue;
     const hgt = it.type === 'bounce' ? 100 : 125;
-    spot(it.x + gl.nx * 6, it.y + gl.ny * 6, hgt, it.x + gl.nx * 200, it.y + gl.ny * 200, 140, gl.rgb, gl.I * (it.type === 'bounce' ? 1.8 : 2.2),
+    spot(V3(it.x + gl.nx * 6, hgt, it.y + gl.ny * 6), V3(it.x + gl.nx * 200, 140, it.y + gl.ny * 200), gl.rgb, gl.I * (it.type === 'bounce' ? 1.8 : 2.2),
       clamp(gl.spread / 2, 15, 80) * D2R, 1, (gl.range || 400) * 1.5, it.type === 'diffusion');
   }
-  // other cameras as small bodies
+  // negative fill: black panels actively pull light away from their surroundings
+  for (const it of L('negfill')) {
+    const k = (it.strength == null ? 60 : it.strength) / 100, c = Math.cos(it.rot * D2R), s = Math.sin(it.rot * D2R);
+    for (const sd of [-1, 1]) {
+      const nx = -s * sd, ny = c * sd;
+      const sp = new T.SpotLight(0xffffff, -1.1 * k, 360 + it.w, 80 * D2R, 1, 1.2);
+      sp.position.set(it.x + nx * 8, 105, it.y + ny * 8);
+      sp.target.position.set(it.x + nx * 250, 115, it.y + ny * 250);
+      sc.add(sp); sc.add(sp.target);
+    }
+  }
+  // other cameras: cinema body with lens and matte box on a tripod
   for (const c of L('camera')) {
     if (camIt && c.id === camIt.id) continue;
-    const g = new T.Group();
-    add(box(30, 20, 18, std(c.color, { roughness: 0.4 })), true, true, g);
-    const lens = add(cyl(6, 6, 14, std('#15171c', { roughness: 0.3 })), true, true, g); lens.rotation.z = Math.PI / 2; lens.position.x = 21;
-    g.position.set(c.x, c.height || 150, c.y);
-    g.rotation.y = -c.rot * D2R;
-    sc.add(g);
-    const st = add(cyl(1.5, 1.5, (c.height || 150) - 10, std('#24262c')), true, true); st.position.set(c.x, ((c.height || 150) - 10) / 2, c.y);
+    const ch = c.height || 150, g = new T.Group();
+    g.position.set(c.x, ch, c.y); g.rotation.y = -c.rot * D2R; sc.add(g);
+    const bodyM = std('#2a2d33', { roughness: 0.45, metalness: 0.35 });
+    const G = (m, x, y, z) => add(at(m, x, y, z), true, true, g);
+    G(box(30, 15, 12, bodyM), 0, 0, 0);
+    G(box(18, 9, 0.6, std(c.color, { roughness: 0.4 })), -2, 0, 6.3);
+    G(box(18, 2, 2, blackM), 0, 13.5, 0);
+    for (const x of [-8, 8]) G(box(2, 5, 2, blackM), x, 10, 0);
+    G(cyl(5.5, 5.5, 8, blackM, 24), 19, 0, 0).rotation.z = Math.PI / 2;
+    G(cyl(6.6, 6.6, 4, std('#3a3d44', { roughness: 0.6 }), 24), 23.5, 0, 0).rotation.z = Math.PI / 2;
+    G(cyl(6.9, 6.9, 6, blackM, 24), 28, 0, 0).rotation.z = Math.PI / 2;
+    const lens = G(new T.Mesh(new T.CircleGeometry(5.8, 24), new T.MeshPhongMaterial({ color: '#0b1220', specular: '#8fb4ff', shininess: 200 })), 31.1, 0, 0);
+    lens.rotation.y = Math.PI / 2;
+    for (const [w2, h2, d2, y, z] of [[10, 0.6, 24, 8, 0], [10, 0.6, 24, -8, 0], [10, 16, 0.6, 0, 12], [10, 16, 0.6, 0, -12]]) G(box(w2, h2, d2, blackM), 36, y, z);
+    G(box(1, 7, 11, blackM), -6, 12, -9).rotation.y = -0.4;
+    G(cyl(2.2, 2.2, 6, blackM, 16), -18, 3, -4).rotation.z = Math.PI / 2;
+    add(at(cyl(7, 7, 4, blackM, 20), c.x, ch - 10, c.y));
+    for (let k = 0; k < 3; k++) {
+      const a = k * 2.094 + 0.3;
+      rod(V3(c.x, ch - 12, c.y), V3(c.x + Math.cos(a) * 48, 1, c.y + Math.sin(a) * 48), 1.3, metal);
+      rod(V3(c.x + Math.cos(a) * 14, ch * 0.45, c.y + Math.sin(a) * 14), V3(c.x, ch * 0.42, c.y), 0.6, metal);
+    }
   }
   PV.scene = sc;
 }
@@ -4146,7 +4883,7 @@ function pvTick() {
   if (!cams.some((c) => c.id === PV.camId)) { PV.camId = cams[0] ? cams[0].id : null; PV.builtVer = -1; }
   if (PV.camId && pvSel.value !== PV.camId) pvSel.value = PV.camId;
   const now = performance.now();
-  if (!(PV.builtVer !== ED.ver || anim.size || PV.sizeDirty) || now - PV.lastBuild < 90) return;
+  if (!(PV.builtVer !== ED.ver || anim.size || PV.sizeDirty) || now - PV.lastBuild < 120) return;
   PV.lastBuild = now;
   PV.builtVer = ED.ver;
   PV.sizeDirty = false;
