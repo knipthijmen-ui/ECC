@@ -728,7 +728,7 @@ const DEFAULTS = {
   person: { label: 'Talent', color: '#6366f1', size: 1, skin: '#e0ac8a', hair: '#3b2a1e', pants: '#2b303b' },
   table: { label: '', shape: 'rect', w: 160, h: 80, color: '#d6b48a' },
   camera: { label: 'Cam A', color: '#ef4444', fov: 54, range: 500, showCone: true, height: 150 },
-  lamp: { label: 'Key', kind: 'cob', mod: 'reflector', barndoors: false, doors: 45, grid: false, on: true, cmode: 'cct', kelvin: 5600, gel: '', hue: 210, sat: 100, intensity: 80, beam: 55, range: 700, height: 190, gobo: 'window', goboRot: 0, prac: 'bulb' },
+  lamp: { label: 'Key', kind: 'cob', mod: 'reflector', barndoors: false, doors: 45, grid: false, on: true, cmode: 'cct', kelvin: 5600, gel: '', hue: 210, sat: 100, intensity: 80, beam: 55, range: 700, height: 190, gobo: 'window', goboRot: 0, focus: 85, prac: 'bulb' },
   bounce: { label: '', surface: 'white', reflect: 70, w: 100 },
   mirror: { label: '', reflect: 90, w: 80 },
   diffusion: { label: '', strength: 50, w: 120 },
@@ -746,7 +746,7 @@ const LAMP_PRESETS = {
   fresnel: { kind: 'cob', mod: 'fresnel', beam: 30, barndoors: true, doors: 40, range: 850, kelvin: 5600 },
   softbox: { kind: 'cob', mod: 'softbox', beam: 110, range: 450, kelvin: 5600 },
   led: { kind: 'led', beam: 70, range: 500, kelvin: 4300 },
-  gobo: { kind: 'gobo', beam: 26, range: 900, kelvin: 4300, intensity: 90, gobo: 'window', label: 'Gobo' },
+  gobo: { kind: 'gobo', beam: 26, range: 900, kelvin: 4300, intensity: 90, gobo: 'window', focus: 90, label: 'Gobo' },
   bulb: { kind: 'practical', prac: 'bulb', range: 260, kelvin: 2700, intensity: 60, height: 200 },
   tablelamp: { kind: 'practical', prac: 'tablelamp', range: 280, kelvin: 2700, intensity: 55 },
   floorlamp: { kind: 'practical', prac: 'floorlamp', range: 340, kelvin: 2900, intensity: 65 },
@@ -1000,12 +1000,52 @@ function goboCanvas(key, S, mode, rotDeg) {
   goboCache.set(ck, cv2);
   return cv2;
 }
+/* The gobo shape in the lamp colour on a transparent background (for the plan view). */
+function goboDecal(key, rotDeg, rgb) {
+  const ck = key + '|' + rotDeg + '|' + rgb.join(',') + '|decal';
+  if (goboCache.has(ck)) return goboCache.get(ck);
+  const S = 128, cv2 = document.createElement('canvas');
+  cv2.width = cv2.height = S;
+  const c = cv2.getContext('2d');
+  c.save();
+  c.beginPath(); c.arc(S / 2, S / 2, S * 0.47, 0, Math.PI * 2); c.clip();
+  c.translate(S / 2, S / 2); c.rotate((rotDeg || 0) * D2R); c.translate(-S / 2, -S / 2);
+  c.fillStyle = rgba(rgb.map((v) => lerp(v, 255, 0.45)), 1);
+  goboHoles(c, S, key);
+  c.restore();
+  goboCache.set(ck, cv2);
+  return cv2;
+}
+function drawGoboSpots(ctx, items, segs, px, amul) {
+  for (const it of items) {
+    if (it.type !== 'lamp' || it.kind !== 'gobo' || !it.on || !(it.intensity > 0)) continue;
+    const a = it.rot * D2R, dx = Math.cos(a), dy = Math.sin(a), F = lampFront(it);
+    const ox = it.x + dx * F, oy = it.y + dy * F;
+    const hit = castRay(segs, ox, oy, dx, dy, it.range, it.id);
+    if (!hit) continue;
+    const t = hit.t + F, size = 2 * t * Math.tan((effBeam(it) / 2) * D2R);
+    const back = Math.min(size / 2, hit.t * 0.5);
+    const hx = ox + dx * (hit.t - back), hy = oy + dy * (hit.t - back);
+    const soft = (100 - (it.focus == null ? 85 : it.focus)) / 100;
+    const img = goboDecal(it.gobo || 'window', it.goboRot || 0, lampRgb(it));
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.globalAlpha = clamp((it.intensity / 100) * 0.75 * amul * (1 - 0.15 * Math.min(1, hit.t / it.range)), 0, 1);
+    const blurPx = soft * size * 0.09 * (SHS || 1);
+    if (blurPx > 0.4) ctx.filter = `blur(${blurPx.toFixed(1)}px)`;
+    ctx.drawImage(img, hx - size / 2, hy - size / 2, size, size);
+    ctx.filter = 'none';
+    ctx.restore();
+    label(ctx, 'Ø ' + fmtM(Math.round(size / 5) * 5), hx - dx * (size / 2 + 16 * px), hy - dy * (size / 2 + 16 * px), px);
+  }
+}
 const goboThumbs = {};
 const goboThumb = (k) => goboThumbs[k] || (goboThumbs[k] = goboCanvas(k, 76, 'thumb', 0).toDataURL());
 /* Which part of the beam the gobo lets through along its horizontal centre line. */
 const maskCache = new Map();
-function goboRowMask(key, rotDeg) {
-  const ck = key + '|' + rotDeg;
+function goboRowMask(key, rotDeg, focus) {
+  const f = focus == null ? 85 : focus;
+  const ck = key + '|' + rotDeg + '|' + f;
   let row = maskCache.get(ck);
   if (!row) {
     // fraction of each column that lets light through, normalised to the most open column
@@ -1015,6 +1055,9 @@ function goboRowMask(key, rotDeg) {
     for (let x = 0; x < 64; x++) { let open = 0; for (let y = 0; y < 64; y++) if (d[(y * 64 + x) * 4] < 128) open++; row.push(open); }
     const mx = Math.max(1, ...row);
     row = row.map((v) => (v / mx < 0.06 ? 0 : Math.min(1, (v / mx) * 1.15)));
+    // out of focus: blur the pattern across the beam
+    const br = Math.round(((100 - f) / 100) * 9);
+    if (br > 0) row = row.map((_, x) => { let a = 0, k = 0; for (let j = -br; j <= br; j++) { const q = row[x + j]; if (q != null) { a += q; k++; } } return a / k; });
     maskCache.set(ck, row);
   }
   return (af) => row[clamp(Math.floor((af + 0.5) * 64), 0, 63)];
@@ -1368,7 +1411,7 @@ function computeLight(items) {
     sources.push({ x: fp.x, y: fp.y, rgb, I: I * 0.95, r: coreR, core: true });
     sources.push({ x: it.x, y: it.y, rgb, I: I * (omni ? 0.3 : 0.16), r: Math.min(omni ? 300 : 420, it.range * (omni ? 0.6 : 0.42)) });
     const n = omni ? 180 : clamp(Math.round(beam * 2.2), 28, 220);
-    const mask = it.kind === 'gobo' ? goboRowMask(it.gobo || 'window', it.goboRot || 0) : null;
+    const mask = it.kind === 'gobo' ? goboRowMask(it.gobo || 'window', it.goboRot || 0, it.focus) : null;
     const A = lampRays(it, beam, n, mask, beam);
     const pathsA = traceRays(A.rays, segs, it.range + A.back, collector(rgb, I, n));
     layers.push({ polys: fanPolys(pathsA), rgb, I: I * (omni ? 0.7 : 0.5), range: it.range + A.back });
@@ -2285,6 +2328,7 @@ function drawScene(ctx, o) {
   if (o.light && la > 0.01) drawLightLayer(ctx, o.light, S, T, la * (ANIM_T == null ? 1 : 1 + 0.03 * Math.sin(ANIM_T / 900)));
   ctx.setTransform(T[0], 0, 0, T[0], T[1], T[2]);
   drawRoomLabels(ctx, rooms, px);
+  if (o.light && la > 0.01) drawGoboSpots(ctx, L('lamp'), o.light.segs, px, la);
   for (const it of L('negfill')) drawNegHalo(ctx, it);
   const ca = typeof o.cones === 'number' ? o.cones : (o.cones ? 1 : 0);
   if (ca > 0.01) {
@@ -3682,7 +3726,8 @@ function fieldsFor(it) {
           if (it.barndoors) f.push({ k: 'doors', t: 'range', l: 'Opening barndoors', min: 6, max: 120, step: 1, fmt: (v) => v + '°', get: (o) => o.doors || 45 });
         }
       }
-      if (it.kind === 'gobo') f.push({ k: 'gobo', t: 'gobo', l: 'Gobo' }, { k: 'goboRot', t: 'range', l: 'Gobo draaien', min: 0, max: 360, step: 5, fmt: (v) => v + '°', get: (o) => o.goboRot || 0 });
+      if (it.kind === 'gobo') f.push({ k: 'gobo', t: 'gobo', l: 'Gobo' }, { k: 'goboRot', t: 'range', l: 'Gobo draaien', min: 0, max: 360, step: 5, fmt: (v) => v + '°', get: (o) => o.goboRot || 0 },
+        { k: 'focus', t: 'range', l: 'Focus (zacht ↔ scherp)', min: 0, max: 100, step: 1, fmt: (v) => (v < 30 ? 'zacht' : v < 70 ? 'half' : 'scherp') + ' · ' + v + '%', get: (o) => (o.focus == null ? 85 : o.focus) });
       if (it.kind === 'practical') f.push({ k: 'prac', t: 'seg', l: 'Soort', opts: [['bulb', 'Peer'], ['tablelamp', 'Schemer'], ['floorlamp', 'Staand'], ['tube', 'TL'], ['candle', 'Kaars']] });
       f.push({ k: 'intensity', t: 'range', l: 'Intensiteit', min: 0, max: 100, step: 1, fmt: (v) => v + '%' });
       const cm = it.cmode || (it.gel ? 'gel' : 'cct');
@@ -4271,7 +4316,7 @@ function setPreview(on) {
       const T = window.THREE;
       PV.renderer = new T.WebGLRenderer({ canvas: pvCv, antialias: true, preserveDrawingBuffer: true });
       PV.renderer.shadowMap.enabled = true;
-      PV.renderer.shadowMap.type = T.PCFSoftShadowMap;
+      PV.renderer.shadowMap.type = T.PCFShadowMap;
       PV.renderer.outputEncoding = T.sRGBEncoding;
       PV.renderer.toneMapping = T.ACESFilmicToneMapping;
       PV.renderer.toneMappingExposure = 1.05;
@@ -4647,7 +4692,7 @@ function pvBuild(items, camIt) {
   // ---------- lights ----------
   sc.add(new T.HemisphereLight('#aeb8cc', '#2a2e36', 0.16));
   let spotShadows = 0, pointShadows = 0;
-  const spot = (pos, tgt, rgb, I, angle, pen, range, wantShadow, mapSize) => {
+  const spot = (pos, tgt, rgb, I, angle, pen, range, wantShadow, mapSize, radius) => {
     const s = new T.SpotLight(new T.Color(rgba(rgb, 1)), I, range, clamp(angle, 1.5 * D2R, 85 * D2R), pen, 1);
     s.position.copy(pos);
     s.target.position.copy(tgt);
@@ -4658,6 +4703,7 @@ function pvBuild(items, camIt) {
       s.shadow.camera.near = 0.5;
       s.shadow.camera.far = range;
       s.shadow.bias = -0.0006;
+      s.shadow.radius = radius != null ? radius : 1.5 + pen * 3;
     }
     sc.add(s); sc.add(s.target);
     return s;
@@ -4665,7 +4711,7 @@ function pvBuild(items, camIt) {
   const point = (pos, rgb, I, range, decay, wantShadow) => {
     const p = new T.PointLight(new T.Color(rgba(rgb, 1)), I, range, decay == null ? 1.6 : decay);
     p.position.copy(pos);
-    if (wantShadow && pointShadows < 2) { pointShadows++; p.castShadow = true; p.shadow.mapSize.set(512, 512); p.shadow.camera.near = 2; p.shadow.bias = -0.002; }
+    if (wantShadow && pointShadows < 2) { pointShadows++; p.castShadow = true; p.shadow.mapSize.set(512, 512); p.shadow.camera.near = 2; p.shadow.bias = -0.002; p.shadow.radius = 2.5; }
     sc.add(p);
     return p;
   };
@@ -4774,7 +4820,8 @@ function pvBuild(items, camIt) {
     const beam = effBeam(it);
     const pen = it.kind === 'gobo' ? 0.08 : it.kind === 'led' ? 0.75 : it.mod === 'softbox' ? (it.grid ? 0.7 : 1) : it.mod === 'fresnel' ? 0.3 : 0.45;
     const power = (it.kind === 'gobo' ? 4.2 : it.kind === 'led' ? 2.9 : it.mod === 'softbox' ? 2.6 : it.mod === 'fresnel' ? 3.6 : 3.2) * I;
-    const sp = spot(pos, tgt, rgb, power, (beam / 2) * D2R, pen, it.range * 1.6, true, it.kind === 'gobo' ? 2048 : 1024);
+    const focus = (it.focus == null ? 85 : it.focus) / 100;
+    const sp = spot(pos, tgt, rgb, power, (beam / 2) * D2R, pen, it.range * 1.6, true, it.kind === 'gobo' ? (focus < 0.2 ? 128 : focus < 0.45 ? 256 : focus < 0.75 ? 512 : focus < 0.9 ? 1024 : 2048) : 1024, it.kind === 'gobo' ? lerp(18, 0.6, Math.sqrt(focus)) : undefined);
     if (it.kind === 'gobo' && sp.castShadow) {
       // a cut-out disc in front of the lens: its shadow is the gobo pattern
       const tex = new T.CanvasTexture(goboCanvas(it.gobo || 'window', 256, 'alpha', 0));
