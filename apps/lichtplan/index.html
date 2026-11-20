@@ -295,6 +295,116 @@ textarea.inp { height: auto; min-height: 70px; padding: 10px 12px; resize: verti
   box-shadow: var(--shadow); animation: pop .25s cubic-bezier(.2, 1.35, .4, 1);
 }
 
+/* =============== fancy studio theme (the editor is always dark) =============== */
+#dash {
+  background:
+    radial-gradient(1100px 560px at 8% -12%, rgba(139, 124, 255, .20), transparent 60%),
+    radial-gradient(900px 520px at 105% -5%, rgba(56, 189, 248, .16), transparent 60%),
+    radial-gradient(900px 600px at 50% 115%, rgba(251, 146, 60, .14), transparent 60%),
+    var(--bg);
+}
+.dash-top { background: rgba(23, 26, 33, .6); border-bottom-color: rgba(255, 255, 255, .06); }
+.dash-main h1 {
+  background: linear-gradient(90deg, var(--text) 30%, var(--accent) 70%, #38bdf8);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.btn.primary {
+  background: linear-gradient(135deg, #9b8cff, #6d5efc 50%, #4f8cff); border-color: transparent;
+  box-shadow: 0 8px 26px rgba(109, 94, 252, .45), inset 0 1px 0 rgba(255, 255, 255, .25);
+}
+.btn.primary:hover { background: linear-gradient(135deg, #ab9eff, #7d6fff 50%, #60a0ff); box-shadow: 0 10px 32px rgba(109, 94, 252, .6), 0 0 24px rgba(79, 140, 255, .35); }
+.card { box-shadow: 0 10px 30px rgba(18, 24, 38, .10); }
+.card:hover { box-shadow: 0 22px 50px rgba(18, 24, 38, .20), 0 0 0 1px var(--accent-2), 0 0 40px rgba(139, 124, 255, .30); }
+.card .thumb, .card .thumb.empty { background-color: #363c48; }
+.card .thumb.empty { background-image: radial-gradient(rgba(130, 170, 255, .55) 1.3px, transparent 1.5px); }
+.card.new { background: color-mix(in srgb, var(--panel) 40%, transparent); }
+.card.new:hover { box-shadow: 0 0 30px rgba(139, 124, 255, .25); }
+.card.new .plus { background: linear-gradient(135deg, #9b8cff, #4f8cff); color: #fff; box-shadow: 0 0 22px rgba(109, 94, 252, .5); }
+.logo { box-shadow: 0 6px 16px rgba(109, 94, 252, .35), 0 0 22px rgba(255, 106, 136, .35); }
+
+#dash, .modal .box {
+  --bg: #171a21; --panel: #1f232c; --panel-2: rgba(255, 255, 255, .05); --border: rgba(255, 255, 255, .08);
+  --text: #e9edf5; --muted: #98a2b6; --accent: #9b8cff; --accent-2: #b3a8ff; --accent-soft: rgba(139, 124, 255, .18);
+  color: var(--text); color-scheme: dark;
+}
+#dash {
+  background:
+    radial-gradient(900px 520px at 6% -10%, rgba(139, 124, 255, .32), transparent 60%),
+    radial-gradient(800px 480px at 104% -4%, rgba(56, 189, 248, .24), transparent 60%),
+    radial-gradient(900px 600px at 50% 118%, rgba(251, 146, 60, .22), transparent 60%),
+    #171a21;
+}
+#dash .card { background: linear-gradient(160deg, #252a35, #1c2029); border-color: rgba(255, 255, 255, .07); box-shadow: 0 14px 34px rgba(0, 0, 0, .45); }
+#dash .card.new { background: rgba(255, 255, 255, .03); border-color: rgba(255, 255, 255, .12); }
+#dash .btn:not(.primary) { background: linear-gradient(160deg, rgba(255, 255, 255, .1), rgba(255, 255, 255, .03)); border-color: rgba(255, 255, 255, .1); }
+.modal .box { box-shadow: 0 30px 80px rgba(0, 0, 0, .6), 0 0 0 1px rgba(139, 124, 255, .2), 0 0 50px rgba(139, 124, 255, .2); }
+.modal .tpl { background: rgba(255, 255, 255, .04); border-color: rgba(255, 255, 255, .08); }
+.modal .tpl.on { background: linear-gradient(160deg, rgba(139, 124, 255, .3), rgba(139, 124, 255, .08)); border-color: #9b8cff; box-shadow: 0 0 24px rgba(139, 124, 255, .35); }
+.modal .tpl .ic { background: rgba(0, 0, 0, .3); color: #b3a8ff; }
+
+#editor, .popup, .ghost, .toast {
+  --panel: #1d212a; --panel-2: rgba(255, 255, 255, .05); --border: rgba(255, 255, 255, .08);
+  --text: #e9edf5; --muted: #98a2b6; --accent: #8b7cff; --accent-2: #b3a8ff; --accent-soft: rgba(139, 124, 255, .18);
+  color: var(--text); color-scheme: dark;
+}
+#editor { background: #15181e; }
+.ed-top { background: linear-gradient(180deg, #252a36, #1b1f28); border-bottom: 1px solid rgba(255, 255, 255, .05); box-shadow: 0 8px 28px rgba(0, 0, 0, .4); position: relative; }
+.ed-top::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 1px; pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(139, 124, 255, .8), rgba(56, 189, 248, .7), rgba(251, 146, 60, .6), transparent);
+  box-shadow: 0 0 12px rgba(139, 124, 255, .6);
+}
+.ed-top .pname:hover { border-color: rgba(255, 255, 255, .1); }
+.sep { background: rgba(255, 255, 255, .08); }
+.palette { background: linear-gradient(180deg, #1f232c, #16191f); border-right: 1px solid rgba(255, 255, 255, .05); box-shadow: 8px 0 28px rgba(0, 0, 0, .35); }
+.pgroup h4 { color: var(--gc); display: flex; align-items: center; gap: 7px; }
+.pgroup h4::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--gc); box-shadow: 0 0 10px var(--gc); }
+.pitem {
+  background: linear-gradient(160deg, rgba(255, 255, 255, .08), rgba(255, 255, 255, .02));
+  border-color: rgba(255, 255, 255, .07); color: #dde3ee;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, .38), inset 0 1px 0 rgba(255, 255, 255, .07);
+}
+.pitem svg.i { color: var(--gc); filter: drop-shadow(0 0 5px color-mix(in srgb, var(--gc) 50%, transparent)); }
+.pitem:hover { border-color: color-mix(in srgb, var(--gc) 70%, transparent); transform: translateY(-1px); box-shadow: 0 10px 24px rgba(0, 0, 0, .45), 0 0 20px color-mix(in srgb, var(--gc) 35%, transparent); }
+.pitem:hover svg.i { color: var(--gc); filter: drop-shadow(0 0 10px var(--gc)); }
+.pitem.on { background: linear-gradient(160deg, color-mix(in srgb, var(--gc) 38%, transparent), color-mix(in srgb, var(--gc) 10%, transparent)); border-color: var(--gc); color: #fff; box-shadow: 0 0 0 1px var(--gc), 0 0 26px color-mix(in srgb, var(--gc) 50%, transparent); }
+.pitem.on svg.i { color: #fff; filter: drop-shadow(0 0 8px var(--gc)); }
+.pitem .k { color: rgba(255, 255, 255, .45); }
+.icon-btn:hover { background: rgba(255, 255, 255, .07); }
+.icon-btn.on { background: linear-gradient(160deg, rgba(139, 124, 255, .4), rgba(139, 124, 255, .12)); color: #fff; box-shadow: 0 0 18px rgba(139, 124, 255, .4), inset 0 0 0 1px rgba(139, 124, 255, .55); }
+.gsz { background: rgba(0, 0, 0, .28); border-color: rgba(255, 255, 255, .07); }
+.gsz button.on { background: linear-gradient(160deg, #9b8cff, #6d5efc); color: #fff; box-shadow: 0 0 16px rgba(139, 124, 255, .6); }
+#editor .btn { background: linear-gradient(160deg, rgba(255, 255, 255, .1), rgba(255, 255, 255, .03)); border-color: rgba(255, 255, 255, .1); box-shadow: 0 6px 16px rgba(0, 0, 0, .35); }
+#editor .btn:hover { border-color: rgba(139, 124, 255, .7); box-shadow: 0 0 22px rgba(139, 124, 255, .4); }
+.stage { background: #363c48; }
+.hint { background: rgba(20, 23, 30, .78); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, .09); box-shadow: 0 10px 28px rgba(0, 0, 0, .4), 0 0 24px rgba(139, 124, 255, .22); }
+.status { background: rgba(20, 23, 30, .72); color: #b9c2d4; border-color: rgba(255, 255, 255, .08); backdrop-filter: blur(10px); box-shadow: 0 6px 18px rgba(0, 0, 0, .3); }
+.popup {
+  background: rgba(26, 30, 39, .88); backdrop-filter: blur(22px) saturate(1.4); -webkit-backdrop-filter: blur(22px) saturate(1.4);
+  border: 1px solid rgba(255, 255, 255, .09);
+  box-shadow: 0 28px 70px rgba(0, 0, 0, .6), 0 0 0 1px rgba(139, 124, 255, .18), 0 0 46px rgba(139, 124, 255, .18);
+}
+.pp-head, .pp-foot { background: rgba(27, 31, 40, .96); }
+.pp-ic { box-shadow: 0 0 22px var(--icg), inset 0 1px 0 rgba(255, 255, 255, .35); }
+.fld { border-top-color: rgba(255, 255, 255, .06); }
+.fld-h .v { background: rgba(255, 255, 255, .07); }
+input[type=range].rng { --track: linear-gradient(90deg, #9b8cff 0, #38bdf8 var(--p), rgba(255, 255, 255, .12) var(--p)); }
+input[type=range].rng::-webkit-slider-thumb { border-color: #b3a8ff; box-shadow: 0 0 0 4px rgba(139, 124, 255, .2), 0 0 16px rgba(139, 124, 255, .75); }
+input[type=range].rng::-moz-range-thumb { box-shadow: 0 0 0 4px rgba(139, 124, 255, .2), 0 0 16px rgba(139, 124, 255, .75); }
+input[type=range].rng.kel { --track: linear-gradient(90deg, #ff7018, #ff9228, #ffb234, #ffd66e, #d6e2be, #82beff, #6096ff, #486eff); }
+.tgl input:checked + .sl { background: linear-gradient(90deg, #9b8cff, #38bdf8); box-shadow: 0 0 16px rgba(139, 124, 255, .6); }
+.seg { background: rgba(0, 0, 0, .25); }
+.seg button.on { background: linear-gradient(160deg, #9b8cff, #6d5efc); color: #fff; box-shadow: 0 0 16px rgba(139, 124, 255, .55); }
+.sw button { border-color: #1d212a; box-shadow: 0 0 0 1px rgba(255, 255, 255, .12), 0 3px 8px rgba(0, 0, 0, .35); }
+.sw button.on { box-shadow: 0 0 0 2px #fff, 0 0 16px rgba(179, 168, 255, .9); }
+.chip { background: rgba(255, 255, 255, .06); border-color: rgba(255, 255, 255, .09); }
+.chip:hover { box-shadow: 0 0 14px rgba(139, 124, 255, .4); }
+.popup .inp { background: rgba(0, 0, 0, .28); border-color: rgba(255, 255, 255, .1); }
+.ghost { background: rgba(29, 33, 42, .92); border-color: #9b8cff; box-shadow: 0 16px 40px rgba(0, 0, 0, .5), 0 0 32px rgba(139, 124, 255, .55); }
+.toast { background: linear-gradient(135deg, rgba(36, 40, 52, .95), rgba(26, 30, 39, .95)); border: 1px solid rgba(255, 255, 255, .1); box-shadow: 0 16px 40px rgba(0, 0, 0, .45), 0 0 26px rgba(139, 124, 255, .35); }
+.press circle { stroke: #b3a8ff; filter: drop-shadow(0 0 6px #8b7cff); }
+@media (prefers-reduced-motion: reduce) { .popup, .modal .box, .toast { animation: none; } }
+
 @media (max-width: 760px) {
   #editor { grid-template-columns: 1fr; grid-template-rows: 54px 1fr 84px; }
   .palette { grid-row: 3; border-right: 0; border-top: 1px solid var(--border); display: flex; gap: 14px; overflow-x: auto; overflow-y: hidden; padding: 8px 10px; }
@@ -456,7 +566,7 @@ const TYPE_NAMES = {
 };
 const TYPE_COLORS = {
   person: '#6366f1', table: '#b8875a', camera: '#ef4444', lamp: '#f59e0b', bounce: '#64748b', mirror: '#0ea5e9',
-  diffusion: '#94a3b8', flag: '#111827', door: '#7c3aed', window: '#0284c7', text: '#eab308', wall: '#1f2937',
+  diffusion: '#94a3b8', flag: '#111827', door: '#7c3aed', window: '#0284c7', text: '#eab308', wall: '#94a3b8',
   link: '#111827', stroke: '#e11d48',
 };
 const DEFAULTS = {
@@ -471,9 +581,9 @@ const DEFAULTS = {
   door: { w: 90, flip: false, swap: false, thick: 15 },
   window: { w: 120, thick: 15 },
   text: { text: 'Tekst', size: 18, color: '#111827', bg: '#fff4bf', bold: false },
-  wall: { thick: 15, color: '#1f2937' },
-  link: { color: '#111827', width: 2, dash: false, head: 'arrow', curve: 0.25 },
-  stroke: { color: '#e11d48', width: 3, opacity: 1 },
+  wall: { thick: 15, color: '#e9edf5' },
+  link: { color: '#e2e8f0', width: 2, dash: false, head: 'arrow', curve: 0.25 },
+  stroke: { color: '#f472b6', width: 3, opacity: 1 },
 };
 const LAMP_PRESETS = {
   fresnel: { kind: 'fresnel', beam: 36, range: 650 },
@@ -482,7 +592,7 @@ const LAMP_PRESETS = {
 };
 
 const PALETTE = [
-  { title: 'Gereedschap', items: [
+  { title: 'Gereedschap', color: '#b3a8ff', items: [
     { tool: 'select', label: 'Selecteren', key: 'V', icon: I.select },
     { tool: 'hand', label: 'Verschuiven', key: 'H', icon: I.hand },
     { tool: 'wall', label: 'Muur', key: 'W', icon: I.wall },
@@ -492,17 +602,17 @@ const PALETTE = [
     { tool: 'text', label: 'Tekst', key: 'T', icon: I.text },
     { tool: 'pen', label: 'Tekenen', key: 'P', icon: I.pen },
   ] },
-  { title: 'Set', items: [
+  { title: 'Set', color: '#60a5fa', items: [
     { place: 'person', label: 'Persoon', icon: I.person },
     { place: 'table', label: 'Tafel', icon: I.table },
     { place: 'camera', label: 'Camera', icon: I.camera },
   ] },
-  { title: 'Lampen', items: [
+  { title: 'Lampen', color: '#fbbf24', items: [
     { place: 'lamp', preset: LAMP_PRESETS.fresnel, label: 'Fresnel', icon: I.fresnel },
     { place: 'lamp', preset: LAMP_PRESETS.led, label: 'LED-paneel', icon: I.led },
     { place: 'lamp', preset: LAMP_PRESETS.softbox, label: 'Softbox', icon: I.softbox },
   ] },
-  { title: 'Licht vormen', items: [
+  { title: 'Licht vormen', color: '#2dd4bf', items: [
     { place: 'bounce', label: 'Piepschuim', icon: I.bounce },
     { place: 'mirror', label: 'Spiegel', icon: I.mirror },
     { place: 'diffusion', label: 'Diffusie', icon: I.diffusion },
@@ -760,31 +870,38 @@ function linkGeom(l, items) {
    Light engine — 2D ray casting with mirrors, bounce boards,
    diffusion frames and blockers.
    ===================================================================== */
+/* Split a wall into the solid pieces left after cutting door/window openings. */
+function wallPieces(it, opens) {
+  const L = wallLen(it);
+  if (L < 1) return [];
+  const ex = (it.x2 - it.x1) / L, ey = (it.y2 - it.y1) / L, wa = Math.atan2(ey, ex);
+  const cuts = [];
+  for (const o of opens) {
+    const px = o.x - it.x1, py = o.y - it.y1;
+    const t = px * ex + py * ey, d = Math.abs(-px * ey + py * ex);
+    if (d < it.thick / 2 + 6 && Math.abs(Math.sin(o.rot * D2R - wa)) < 0.2 && t > -o.w / 2 && t < L + o.w / 2) cuts.push([t - o.w / 2, t + o.w / 2]);
+  }
+  cuts.sort((a, b) => a[0] - b[0]);
+  const out = [];
+  let cur = 0, curEnd = true;
+  const piece = (t0, t1, e0, e1) => out.push({ ax: it.x1 + ex * t0, ay: it.y1 + ey * t0, bx: it.x1 + ex * t1, by: it.y1 + ey * t1, e0, e1, ex, ey });
+  for (const [c0, c1] of cuts) {
+    if (c0 > cur) piece(cur, c0, curEnd, false);
+    if (c1 > cur) { cur = c1; curEnd = false; }
+  }
+  if (cur < L) piece(cur, L, curEnd, true);
+  return out;
+}
+
 function buildSegs(items) {
   const segs = [];
   const opens = items.filter((i) => i.type === 'door' || i.type === 'window');
   const push = (ax, ay, bx, by, kind, it) => segs.push({ ax, ay, bx, by, kind, id: it.id, item: it });
   for (const it of items) {
     switch (it.type) {
-      case 'wall': {
-        const L = wallLen(it);
-        if (L < 1) break;
-        const ex = (it.x2 - it.x1) / L, ey = (it.y2 - it.y1) / L, wa = Math.atan2(ey, ex);
-        const cuts = [];
-        for (const o of opens) {
-          const px = o.x - it.x1, py = o.y - it.y1;
-          const t = px * ex + py * ey, d = Math.abs(-px * ey + py * ex);
-          if (d < it.thick / 2 + 6 && Math.abs(Math.sin(o.rot * D2R - wa)) < 0.2 && t > -o.w / 2 && t < L + o.w / 2) cuts.push([t - o.w / 2, t + o.w / 2]);
-        }
-        cuts.sort((a, b) => a[0] - b[0]);
-        let cur = 0;
-        for (const [c0, c1] of cuts) {
-          if (c0 > cur) push(it.x1 + ex * cur, it.y1 + ey * cur, it.x1 + ex * c0, it.y1 + ey * c0, 'wall', it);
-          cur = Math.max(cur, c1);
-        }
-        if (cur < L) push(it.x1 + ex * cur, it.y1 + ey * cur, it.x2, it.y2, 'wall', it);
+      case 'wall':
+        for (const pc of wallPieces(it, opens)) push(pc.ax, pc.ay, pc.bx, pc.by, 'wall', it);
         break;
-      }
       case 'table': {
         let pts;
         if (it.shape === 'round') {
@@ -922,6 +1039,7 @@ function computeLight(items) {
   const segs = buildSegs(items);
   const layers = [];
   const glow = {};
+  const sources = [];
   let deposits = new Map();
   const collector = (rgb, I, N) => (s, side, u, e, left) => {
     const key = s.id + '|' + side;
@@ -936,6 +1054,9 @@ function computeLight(items) {
   for (const it of items) {
     if (it.type !== 'lamp' || !it.on || it.intensity <= 0) continue;
     const rgb = lampRgb(it), I = it.intensity / 100;
+    const fp = fromLocal(it, it.kind === 'softbox' ? 10 : it.kind === 'led' ? 8 : 15, 0);
+    sources.push({ x: fp.x, y: fp.y, rgb, I: I * 0.95, r: it.kind === 'softbox' ? 85 : it.kind === 'led' ? 65 : 55, core: true });
+    sources.push({ x: it.x, y: it.y, rgb, I: I * 0.16, r: Math.min(420, it.range * 0.42) });
     const n = clamp(Math.round(it.beam * 2.2), 28, 220);
     const A = lampRays(it, it.beam, n);
     const pathsA = traceRays(A.rays, segs, it.range + A.back, collector(rgb, I, n));
@@ -973,6 +1094,7 @@ function computeLight(items) {
       const u0 = clamp(g.u0 - pad, 0, 1), u1 = clamp(g.u1 + pad, 0, 1);
       const prev = glow[it.id];
       glow[it.id] = { u0: prev ? Math.min(prev.u0, u0) : u0, u1: prev ? Math.max(prev.u1, u1) : u1, rgb, I: Math.max(prev ? prev.I : 0, I2) };
+      sources.push({ x: s.ax + ex * (u0 + u1) / 2 + nx * 4, y: s.ay + ey * (u0 + u1) / 2 + ny * 4, rgb, I: I2 * 0.55, r: 30 + (u1 - u0) * L * 0.45 });
       const spanLen = (u1 - u0) * L;
       const half = spread * D2R / 2;
       const back = Math.min(400, (spanLen / 2) / Math.tan(half));
@@ -993,8 +1115,70 @@ function computeLight(items) {
     }
     if (!deposits.size) break;
   }
-  return { layers, glow, segs };
+  return { layers, glow, segs, sources };
 }
+
+/* Closed rooms = bounded faces of the planar wall graph. Walls are split
+   where another wall ends on them, so an inner wall divides a room. */
+function findRooms(walls) {
+  const nodes = new Map();
+  const node = (x, y) => {
+    const k = Math.round(x) + ',' + Math.round(y);
+    let n = nodes.get(k);
+    if (!n) { n = { k, x: Math.round(x), y: Math.round(y), adj: [] }; nodes.set(k, n); }
+    return n;
+  };
+  const link = (a, b) => { if (a !== b && !a.adj.includes(b)) { a.adj.push(b); b.adj.push(a); } };
+  for (const w of walls) {
+    if (wallLen(w) < 1) continue;
+    const pts = [[0, w.x1, w.y1], [1, w.x2, w.y2]];
+    for (const o of walls) {
+      if (o === w) continue;
+      for (const [x, y] of [[o.x1, o.y1], [o.x2, o.y2]]) {
+        const r = distToSeg(x, y, w.x1, w.y1, w.x2, w.y2);
+        if (r.d < 1 && r.t > 0.001 && r.t < 0.999) pts.push([r.t, x, y]);
+      }
+    }
+    pts.sort((a, b) => a[0] - b[0]);
+    for (let i = 0; i < pts.length - 1; i++) link(node(pts[i][1], pts[i][2]), node(pts[i + 1][1], pts[i + 1][2]));
+  }
+  for (const n of nodes.values()) n.adj.sort((p, q) => Math.atan2(p.y - n.y, p.x - n.x) - Math.atan2(q.y - n.y, q.x - n.x));
+  const used = new Set(), rooms = [];
+  for (const a of nodes.values()) {
+    for (const b of a.adj) {
+      if (used.has(a.k + '>' + b.k)) continue;
+      const poly = [];
+      let u = a, v = b, guard = 0;
+      while (guard++ < 4000) {
+        used.add(u.k + '>' + v.k);
+        poly.push(u);
+        const i = v.adj.indexOf(u);
+        const nx = v.adj[(i - 1 + v.adj.length) % v.adj.length];
+        u = v; v = nx;
+        if (u === a && v === b) break;
+      }
+      let A = 0, cx = 0, cy = 0;
+      for (let i = 0; i < poly.length; i++) {
+        const p = poly[i], q = poly[(i + 1) % poly.length], f = p.x * q.y - q.x * p.y;
+        A += f; cx += (p.x + q.x) * f; cy += (p.y + q.y) * f;
+      }
+      A /= 2;
+      if (A < 5000) continue;
+      rooms.push({ pts: poly.map((p) => [p.x, p.y]), area: A, cx: cx / (6 * A), cy: cy / (6 * A), key: poly.map((p) => p.k).sort().join(' ') });
+    }
+  }
+  return rooms;
+}
+const FLOOR_TINTS = [
+  ['#7d879b', '#636c80'], ['#6f8c90', '#566f75'], ['#8a7e98', '#6c627c'], ['#958977', '#776c5d'],
+  ['#7484a6', '#5c6a8a'], ['#7f9483', '#637668'],
+];
+function roomTint(r) {
+  let h = 0;
+  for (let i = 0; i < r.key.length; i++) h = (h * 31 + r.key.charCodeAt(i)) | 0;
+  return FLOOR_TINTS[Math.abs(h) % FLOOR_TINTS.length];
+}
+const fmtArea = (a) => (a / 10000).toFixed(1).replace('.', ',') + ' m²';
 
 const CAM_KINDS = { wall: 1, block: 1 };
 function cameraPoly(it, segs) {
@@ -1018,7 +1202,11 @@ const lensFromFov = (fov) => Math.round(36 / (2 * Math.tan((fov * D2R) / 2)));
 /* =====================================================================
    Rendering
    ===================================================================== */
-const ACCENT = '#6d5efc';
+const ACCENT = '#8b7cff';
+let SHS = 1; // shadow scale: device pixels per css pixel, softened by zoom
+function shadowOn(c, blur, oy, a) { c.shadowColor = `rgba(0,0,0,${a == null ? 0.5 : a})`; c.shadowBlur = blur * SHS; c.shadowOffsetX = 0; c.shadowOffsetY = oy * SHS; }
+function glowOn(c, color, blur) { c.shadowColor = color; c.shadowBlur = blur * SHS; c.shadowOffsetX = 0; c.shadowOffsetY = 0; }
+function shadowOff(c) { c.shadowColor = 'transparent'; c.shadowBlur = 0; c.shadowOffsetY = 0; }
 const lightCv = document.createElement('canvas');
 
 function drawGrid(ctx, S, W, H, V, gridSize, show, mag) {
@@ -1027,8 +1215,8 @@ function drawGrid(ctx, S, W, H, V, gridSize, show, mag) {
   while (gs * V.z < 12) gs *= 2;
   const wx0 = -V.x / V.z, wy0 = -V.y / V.z, wx1 = (W - V.x) / V.z, wy1 = (H - V.y) / V.z;
   const ix0 = Math.floor(wx0 / gs), ix1 = Math.ceil(wx1 / gs), iy0 = Math.floor(wy0 / gs), iy1 = Math.ceil(wy1 / gs);
-  const major = Math.max(1, Math.round(100 / gs)) * (gs < 100 ? 1 : 0) || 0;
-  const MR = 90;
+  const major = gs < 100 ? Math.max(1, Math.round(100 / gs)) : 0;
+  const MR = 95;
   if (show) {
     ctx.beginPath();
     const big = [];
@@ -1042,34 +1230,37 @@ function drawGrid(ctx, S, W, H, V, gridSize, show, mag) {
         ctx.arc(sx, sy, 1.3, 0, Math.PI * 2);
       }
     }
-    ctx.fillStyle = '#c9cfd9';
+    ctx.fillStyle = 'rgba(128,166,255,0.36)';
     ctx.fill();
     if (big.length) {
       ctx.beginPath();
       for (let i = 0; i < big.length; i += 2) { ctx.moveTo(big[i] + 1.9, big[i + 1]); ctx.arc(big[i], big[i + 1], 1.9, 0, Math.PI * 2); }
-      ctx.fillStyle = '#a9b2c1';
+      ctx.fillStyle = 'rgba(150,186,255,0.62)';
       ctx.fill();
     }
   }
   if (mag) {
-    // magnifying "field" of dots around the cursor
-    const g0 = gridSize;
-    let gm = g0;
-    while (gm * V.z < 12) gm *= 2;
-    const mx0 = Math.floor(((mag.x - MR - V.x) / V.z) / gm), mx1 = Math.ceil(((mag.x + MR - V.x) / V.z) / gm);
-    const my0 = Math.floor(((mag.y - MR - V.y) / V.z) / gm), my1 = Math.ceil(((mag.y + MR - V.y) / V.z) / gm);
+    // soft blue halo + magnifying field of dots around the cursor
+    const hg = ctx.createRadialGradient(mag.x, mag.y, 0, mag.x, mag.y, MR);
+    hg.addColorStop(0, 'rgba(120,160,255,0.16)');
+    hg.addColorStop(1, 'rgba(120,160,255,0)');
+    ctx.fillStyle = hg;
+    ctx.beginPath(); ctx.arc(mag.x, mag.y, MR, 0, Math.PI * 2); ctx.fill();
+    const mx0 = Math.floor(((mag.x - MR - V.x) / V.z) / gs), mx1 = Math.ceil(((mag.x + MR - V.x) / V.z) / gs);
+    const my0 = Math.floor(((mag.y - MR - V.y) / V.z) / gs), my1 = Math.ceil(((mag.y + MR - V.y) / V.z) / gs);
     for (let ix = mx0; ix <= mx1; ix++) {
       for (let iy = my0; iy <= my1; iy++) {
-        const sx = ix * gm * V.z + V.x, sy = iy * gm * V.z + V.y;
-        const d = Math.hypot(sx - mag.x, sy - mag.y);
-        let k = 1 - d / MR;
+        const sx = ix * gs * V.z + V.x, sy = iy * gs * V.z + V.y;
+        let k = 1 - Math.hypot(sx - mag.x, sy - mag.y) / MR;
         if (k <= 0 && !show) continue;
         k = Math.max(0, k);
-        const r = 1.3 + 2.6 * k * k;
+        const r = 1.3 + 2.8 * k * k;
         ctx.beginPath();
         ctx.arc(sx, sy, r, 0, Math.PI * 2);
-        ctx.fillStyle = k > 0 ? `rgba(${Math.round(lerp(201, 109, k))},${Math.round(lerp(207, 94, k))},${Math.round(lerp(217, 252, k))},${show ? 1 : k})` : '#c9cfd9';
+        ctx.fillStyle = `rgba(${Math.round(lerp(128, 190, k))},${Math.round(lerp(166, 215, k))},255,${show ? lerp(0.36, 1, k) : k})`;
+        if (k > 0.45) { ctx.shadowColor = 'rgba(140,180,255,0.9)'; ctx.shadowBlur = 10 * k; }
         ctx.fill();
+        ctx.shadowBlur = 0;
       }
     }
   }
@@ -1085,30 +1276,59 @@ function fillPoly(ctx, pts) {
 
 function drawLightLayer(ctx, light, S, T) {
   const W = ctx.canvas.width, H = ctx.canvas.height;
-  if (lightCv.width !== W || lightCv.height !== H) { lightCv.width = W; lightCv.height = H; }
+  const W2 = Math.ceil(W / 2), H2 = Math.ceil(H / 2);
+  if (lightCv.width !== W2 || lightCv.height !== H2) { lightCv.width = W2; lightCv.height = H2; }
   const l = lightCv.getContext('2d');
   l.setTransform(1, 0, 0, 1, 0, 0);
-  l.clearRect(0, 0, W, H);
+  l.clearRect(0, 0, W2, H2);
   l.globalCompositeOperation = 'lighter';
-  l.setTransform(T[0], 0, 0, T[0], T[1], T[2]);
+  l.setTransform(T[0] / 2, 0, 0, T[0] / 2, T[1] / 2, T[2] / 2);
   for (const L of light.layers) {
     for (const p of L.polys) {
       const a = clamp(L.I * p.e, 0, 1);
       if (a < 0.01) continue;
       const g = l.createRadialGradient(p.vx, p.vy, 0, p.vx, p.vy, L.range);
       g.addColorStop(0, rgba(L.rgb, a));
-      g.addColorStop(0.35, rgba(L.rgb, a * 0.72));
-      g.addColorStop(0.7, rgba(L.rgb, a * 0.32));
+      g.addColorStop(0.12, rgba(L.rgb, a * 0.88));
+      g.addColorStop(0.3, rgba(L.rgb, a * 0.58));
+      g.addColorStop(0.55, rgba(L.rgb, a * 0.3));
+      g.addColorStop(0.8, rgba(L.rgb, a * 0.1));
       g.addColorStop(1, rgba(L.rgb, 0));
       l.fillStyle = g;
       fillPoly(l, p.pts);
     }
   }
+  // the light sources themselves: hot core + wide ambient spill
+  for (const src of light.sources || []) {
+    const g = l.createRadialGradient(src.x, src.y, 0, src.x, src.y, src.r);
+    const hot = src.rgb.map((v) => lerp(v, 255, 0.65));
+    if (src.core) {
+      g.addColorStop(0, rgba(hot, clamp(src.I, 0, 1)));
+      g.addColorStop(0.25, rgba(src.rgb, src.I * 0.55));
+      g.addColorStop(1, rgba(src.rgb, 0));
+    } else {
+      g.addColorStop(0, rgba(src.rgb, src.I));
+      g.addColorStop(0.5, rgba(src.rgb, src.I * 0.35));
+      g.addColorStop(1, rgba(src.rgb, 0));
+    }
+    l.fillStyle = g;
+    l.beginPath(); l.arc(src.x, src.y, src.r, 0, Math.PI * 2); l.fill();
+  }
   l.globalCompositeOperation = 'source-over';
   ctx.save();
   ctx.setTransform(1, 0, 0, 1, 0, 0);
-  ctx.globalAlpha = 0.88;
-  ctx.drawImage(lightCv, 0, 0);
+  ctx.globalCompositeOperation = 'lighter';
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
+  const soft = clamp(T[0] * 3, 1.5, 18);
+  ctx.globalAlpha = 0.92;
+  ctx.filter = `blur(${soft}px)`;
+  ctx.drawImage(lightCv, 0, 0, W, H);
+  // bloom pass
+  ctx.globalAlpha = 0.45;
+  ctx.filter = `blur(${clamp(T[0] * 16, 6, 60)}px)`;
+  ctx.drawImage(lightCv, 0, 0, W, H);
+  ctx.filter = 'none';
   ctx.restore();
 }
 
@@ -1116,16 +1336,23 @@ function label(ctx, text, x, y, px, o) {
   if (!text) return;
   o = o || {};
   const fs = Math.max(12, 10 * px);
+  ctx.save();
   ctx.font = `600 ${fs}px ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif`;
   const w = ctx.measureText(text).width + fs * 0.9, h = fs * 1.5;
-  ctx.fillStyle = o.bg || 'rgba(255,255,255,0.92)';
+  shadowOn(ctx, 10, 2, 0.45);
+  ctx.fillStyle = o.bg || 'rgba(18,21,28,0.82)';
   roundRect(ctx, x - w / 2, y - h / 2, w, h, h / 2);
   ctx.fill();
-  if (!o.bg) { ctx.strokeStyle = 'rgba(17,24,39,0.12)'; ctx.lineWidth = px; ctx.stroke(); }
-  ctx.fillStyle = o.color || '#1f2937';
+  shadowOff(ctx);
+  if (o.bg) { glowOn(ctx, o.bg, 10); ctx.fill(); shadowOff(ctx); }
+  ctx.strokeStyle = o.bg ? 'rgba(255,255,255,0.35)' : 'rgba(255,255,255,0.14)';
+  ctx.lineWidth = px;
+  ctx.stroke();
+  ctx.fillStyle = o.color || '#e9edf5';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillText(text, x, y + fs * 0.04);
+  ctx.restore();
 }
 function roundRect(ctx, x, y, w, h, r) {
   r = Math.min(r, w / 2, h / 2);
@@ -1138,28 +1365,79 @@ function roundRect(ctx, x, y, w, h, r) {
   ctx.closePath();
 }
 
-function drawWalls(ctx, walls) {
-  ctx.lineCap = 'square';
-  ctx.lineJoin = 'miter';
+function wallColor(w) { return !w.color || w.color === '#1f2937' ? '#e9edf5' : w.color; }
+function drawWalls(ctx, walls, opens) {
+  const pieces = [];
   for (const w of walls) {
-    ctx.strokeStyle = w.color || '#1f2937';
-    ctx.lineWidth = w.thick;
-    ctx.beginPath();
-    ctx.moveTo(w.x1, w.y1);
-    ctx.lineTo(w.x2, w.y2);
-    ctx.stroke();
+    for (const pc of wallPieces(w, opens || [])) {
+      const h = w.thick / 2;
+      pieces.push({
+        x1: pc.ax - (pc.e0 ? pc.ex * h : 0), y1: pc.ay - (pc.e0 ? pc.ey * h : 0),
+        x2: pc.bx + (pc.e1 ? pc.ex * h : 0), y2: pc.by + (pc.e1 ? pc.ey * h : 0),
+        thick: w.thick, color: wallColor(w),
+      });
+    }
   }
-  // subtle inner hatch for a drafted look
+  if (!pieces.length) return;
+  const path = (p) => { ctx.beginPath(); ctx.moveTo(p.x1, p.y1); ctx.lineTo(p.x2, p.y2); };
+  ctx.save();
   ctx.lineCap = 'butt';
-  for (const w of walls) {
-    if (w.thick < 10) continue;
-    ctx.strokeStyle = 'rgba(255,255,255,0.10)';
-    ctx.lineWidth = Math.max(1, w.thick * 0.25);
-    ctx.beginPath();
-    ctx.moveTo(w.x1, w.y1);
-    ctx.lineTo(w.x2, w.y2);
-    ctx.stroke();
+  // 1. drop shadow
+  shadowOn(ctx, 18, 7, 0.55);
+  for (const p of pieces) { ctx.strokeStyle = p.color; ctx.lineWidth = p.thick; path(p); ctx.stroke(); }
+  // 2. soft outer glow
+  for (const p of pieces) { glowOn(ctx, rgba(hexToRgb(p.color), 0.45), 12); ctx.strokeStyle = p.color; ctx.lineWidth = p.thick; path(p); ctx.stroke(); }
+  shadowOff(ctx);
+  // 3. bevel highlight down the middle
+  for (const p of pieces) {
+    if (p.thick < 8) continue;
+    ctx.strokeStyle = 'rgba(255,255,255,0.45)';
+    ctx.lineWidth = Math.max(1, p.thick * 0.22);
+    path(p); ctx.stroke();
   }
+  ctx.restore();
+}
+
+function drawFloors(ctx, rooms, px) {
+  for (const r of rooms) {
+    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+    for (const [x, y] of r.pts) { x0 = Math.min(x0, x); y0 = Math.min(y0, y); x1 = Math.max(x1, x); y1 = Math.max(y1, y); }
+    const [ca, cb] = roomTint(r);
+    const path = () => { ctx.beginPath(); r.pts.forEach(([x, y], i) => (i ? ctx.lineTo(x, y) : ctx.moveTo(x, y))); ctx.closePath(); };
+    ctx.save();
+    const g = ctx.createLinearGradient(x0, y0, x1, y1);
+    g.addColorStop(0, ca);
+    g.addColorStop(1, cb);
+    ctx.fillStyle = g;
+    path();
+    ctx.fill();
+    // a gentle sheen from the top-left corner
+    const sh = ctx.createRadialGradient(x0, y0, 0, x0, y0, Math.max(x1 - x0, y1 - y0));
+    sh.addColorStop(0, 'rgba(255,255,255,0.10)');
+    sh.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = sh;
+    ctx.fill();
+    // inner shadow along the walls (ambient occlusion)
+    ctx.clip();
+    ctx.beginPath();
+    ctx.rect(x0 - 2000, y0 - 2000, x1 - x0 + 4000, y1 - y0 + 4000);
+    r.pts.slice().reverse().forEach(([x, y], i) => (i ? ctx.lineTo(x, y) : ctx.moveTo(x, y)));
+    ctx.closePath();
+    shadowOn(ctx, 26, 0, 0.55);
+    ctx.fillStyle = 'rgba(0,0,0,0.9)';
+    ctx.fill('evenodd');
+    ctx.restore();
+  }
+}
+function drawRoomLabels(ctx, rooms, px) {
+  const fs = Math.max(13, 11 * px);
+  ctx.save();
+  ctx.font = `600 ${fs}px ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle = 'rgba(255,255,255,0.42)';
+  for (const r of rooms) ctx.fillText(fmtArea(r.area), r.cx, r.cy);
+  ctx.restore();
 }
 
 function drawDoor(ctx, it, px) {
@@ -1167,38 +1445,37 @@ function drawDoor(ctx, it, px) {
   ctx.save();
   ctx.translate(it.x, it.y);
   ctx.rotate(it.rot * D2R);
-  ctx.fillStyle = '#fff';
-  ctx.fillRect(-w / 2, -t / 2 - 1, w, t + 2);
-  ctx.fillStyle = '#1f2937';
-  ctx.fillRect(-w / 2 - 2, -t / 2, 4, t);
-  ctx.fillRect(w / 2 - 2, -t / 2, 4, t);
   const hx = it.flip ? w / 2 : -w / 2;
   const sg = it.swap ? -1 : 1;
   const hy = sg * t / 2;
-  // leaf
-  ctx.strokeStyle = '#374151';
-  ctx.lineWidth = Math.max(2.5, 2 * px);
-  ctx.lineCap = 'round';
-  ctx.beginPath();
-  ctx.moveTo(hx, hy);
-  ctx.lineTo(hx, hy + sg * w);
-  ctx.stroke();
-  // swing arc
   const a0 = Math.atan2(sg * w, 0), a1 = Math.atan2(0, -hx * 2);
   let da = a1 - a0;
   while (da > Math.PI) da -= Math.PI * 2;
   while (da < -Math.PI) da += Math.PI * 2;
+  // swing sector
+  ctx.beginPath();
+  ctx.moveTo(hx, hy);
+  for (let i = 0; i <= 24; i++) { const a = a0 + (da * i) / 24; ctx.lineTo(hx + Math.cos(a) * w, hy + Math.sin(a) * w); }
+  ctx.closePath();
+  const g = ctx.createRadialGradient(hx, hy, 0, hx, hy, w);
+  g.addColorStop(0, 'rgba(179,168,255,0.22)');
+  g.addColorStop(1, 'rgba(179,168,255,0.04)');
+  ctx.fillStyle = g;
+  ctx.fill();
   ctx.setLineDash([6 * px, 4 * px]);
   ctx.lineWidth = Math.max(1, 1.2 * px);
-  ctx.strokeStyle = '#6b7280';
+  ctx.strokeStyle = 'rgba(226,232,240,0.6)';
   ctx.beginPath();
-  for (let i = 0; i <= 24; i++) {
-    const a = a0 + (da * i) / 24;
-    const x = hx + Math.cos(a) * w, y = hy + Math.sin(a) * w;
-    if (i) ctx.lineTo(x, y); else ctx.moveTo(x, y);
-  }
+  for (let i = 0; i <= 24; i++) { const a = a0 + (da * i) / 24; const x = hx + Math.cos(a) * w, y = hy + Math.sin(a) * w; if (i) ctx.lineTo(x, y); else ctx.moveTo(x, y); }
   ctx.stroke();
   ctx.setLineDash([]);
+  // leaf
+  shadowOn(ctx, 8, 3, 0.5);
+  ctx.strokeStyle = '#f1f5f9';
+  ctx.lineWidth = Math.max(3, 2 * px);
+  ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.moveTo(hx, hy); ctx.lineTo(hx, hy + sg * w); ctx.stroke();
+  shadowOff(ctx);
   ctx.restore();
 }
 
@@ -1207,16 +1484,20 @@ function drawWindow(ctx, it, px) {
   ctx.save();
   ctx.translate(it.x, it.y);
   ctx.rotate(it.rot * D2R);
-  ctx.fillStyle = '#e0f2fe';
-  ctx.fillRect(-w / 2, -t / 2 - 0.5, w, t + 1);
-  ctx.strokeStyle = '#1f2937';
+  glowOn(ctx, 'rgba(125,211,252,0.8)', 14);
+  const g = ctx.createLinearGradient(0, -t / 2, 0, t / 2);
+  g.addColorStop(0, 'rgba(186,230,253,0.55)');
+  g.addColorStop(1, 'rgba(56,189,248,0.35)');
+  ctx.fillStyle = g;
+  ctx.fillRect(-w / 2, -t / 2, w, t);
+  shadowOff(ctx);
+  ctx.strokeStyle = '#e9edf5';
   ctx.lineWidth = Math.max(1.5, 1.2 * px);
   ctx.strokeRect(-w / 2, -t / 2, w, t);
-  ctx.strokeStyle = '#0ea5e9';
+  ctx.strokeStyle = 'rgba(255,255,255,0.85)';
   ctx.lineWidth = Math.max(1, px);
   ctx.beginPath();
-  ctx.moveTo(-w / 2, -t / 6); ctx.lineTo(w / 2, -t / 6);
-  ctx.moveTo(-w / 2, t / 6); ctx.lineTo(w / 2, t / 6);
+  ctx.moveTo(-w / 2, 0); ctx.lineTo(w / 2, 0);
   ctx.stroke();
   ctx.restore();
 }
@@ -1234,7 +1515,13 @@ function drawTable(ctx, it, px) {
   } else {
     roundRect(ctx, -it.w / 2, -it.h / 2, it.w, it.h, 6);
   }
+  shadowOn(ctx, 22, 9, 0.55);
+  const tg = ctx.createLinearGradient(-it.w / 2, -it.h / 2, it.w / 2, it.h / 2);
+  tg.addColorStop(0, shade(it.color, 0.18));
+  tg.addColorStop(1, shade(it.color, -0.12));
+  ctx.fillStyle = tg;
   ctx.fill();
+  shadowOff(ctx);
   ctx.stroke();
   // wood grain hint
   ctx.strokeStyle = shade(it.color, -0.12);
@@ -1266,12 +1553,17 @@ function drawPerson(ctx, it, px) {
   ctx.moveTo(14, 0); ctx.lineTo(90, -26); ctx.lineTo(90, 26); ctx.closePath();
   ctx.fill();
   // shoulders + arms
-  ctx.fillStyle = col;
+  const pg = ctx.createLinearGradient(-13, -25, 13, 25);
+  pg.addColorStop(0, shade(col, 0.25));
+  pg.addColorStop(1, shade(col, -0.15));
+  ctx.fillStyle = pg;
   ctx.strokeStyle = shade(col, -0.35);
   ctx.lineWidth = 1.6;
   ctx.beginPath();
   ctx.ellipse(-1, 0, 13, 25, 0, 0, Math.PI * 2);
+  shadowOn(ctx, 16, 6, 0.55);
   ctx.fill();
+  shadowOff(ctx);
   ctx.stroke();
   ctx.fillStyle = shade(col, -0.15);
   ctx.beginPath(); ctx.ellipse(4, -21, 7, 5, 0.3, 0, Math.PI * 2); ctx.fill();
@@ -1296,13 +1588,15 @@ function drawLamp(ctx, it, px) {
   ctx.translate(it.x, it.y);
   ctx.rotate(it.rot * D2R);
   ctx.lineWidth = 1.4;
-  ctx.strokeStyle = '#0f0f12';
+  ctx.strokeStyle = 'rgba(255,255,255,0.35)';
+  shadowOn(ctx, 16, 6, 0.6);
   if (it.kind === 'led') {
     ctx.fillStyle = '#27272a';
     roundRect(ctx, -8, -21, 14, 42, 3); ctx.fill(); ctx.stroke();
+    shadowOff(ctx);
     ctx.fillStyle = '#3f3f46';
     ctx.fillRect(-16, -5, 8, 10);
-    if (on) { ctx.shadowColor = col; ctx.shadowBlur = 14; }
+    if (on) glowOn(ctx, col, 18);
     ctx.fillStyle = col;
     ctx.fillRect(5, -19, 4, 38);
   } else if (it.kind === 'softbox') {
@@ -1310,12 +1604,13 @@ function drawLamp(ctx, it, px) {
     ctx.fillRect(-18, -6, 8, 12);
     ctx.fillStyle = '#3f3f46';
     ctx.beginPath(); ctx.moveTo(-11, -9); ctx.lineTo(8, -27); ctx.lineTo(8, 27); ctx.lineTo(-11, 9); ctx.closePath(); ctx.fill(); ctx.stroke();
-    if (on) { ctx.shadowColor = col; ctx.shadowBlur = 16; }
+    shadowOff(ctx);
+    if (on) glowOn(ctx, col, 20);
     ctx.fillStyle = on ? rgba(rgb.map((v) => lerp(v, 255, 0.55)), 1) : '#d1d5db';
     ctx.fillRect(6, -27, 5, 54);
   } else {
     ctx.fillStyle = '#27272a';
-    roundRect(ctx, -18, -13, 30, 26, 5); ctx.fill(); ctx.stroke();
+    roundRect(ctx, -18, -13, 30, 26, 5); ctx.fill(); shadowOff(ctx); ctx.stroke();
     ctx.strokeStyle = '#52525b';
     ctx.lineWidth = 1.2;
     ctx.beginPath();
@@ -1329,7 +1624,7 @@ function drawLamp(ctx, it, px) {
     ctx.moveTo(14, -12); ctx.lineTo(23, -19);
     ctx.moveTo(14, 12); ctx.lineTo(23, 19);
     ctx.stroke();
-    if (on) { ctx.shadowColor = col; ctx.shadowBlur = 14; }
+    if (on) glowOn(ctx, col, 18);
     ctx.fillStyle = col;
     roundRect(ctx, 11, -10, 5, 20, 2); ctx.fill();
   }
@@ -1346,8 +1641,15 @@ function drawCamera(ctx, it, px) {
   ctx.strokeStyle = shade(col, -0.45);
   ctx.fillStyle = shade(col, -0.25);
   ctx.fillRect(-24, -6, 6, 12);
-  ctx.fillStyle = col;
-  roundRect(ctx, -19, -13, 31, 26, 5); ctx.fill(); ctx.stroke();
+  const cg = ctx.createLinearGradient(-19, -13, 12, 13);
+  cg.addColorStop(0, shade(col, 0.25));
+  cg.addColorStop(1, shade(col, -0.2));
+  ctx.fillStyle = cg;
+  roundRect(ctx, -19, -13, 31, 26, 5);
+  shadowOn(ctx, 16, 6, 0.6);
+  ctx.fill();
+  shadowOff(ctx);
+  ctx.stroke();
   ctx.fillStyle = '#1f2937';
   ctx.fillRect(12, -9, 10, 18);
   ctx.fillStyle = '#4b5563';
@@ -1364,11 +1666,12 @@ function drawPanel(ctx, it, px, glow) {
   ctx.translate(it.x, it.y);
   ctx.rotate(it.rot * D2R);
   ctx.lineWidth = Math.max(1.2, px);
+  shadowOn(ctx, 14, 6, 0.55);
   if (it.type === 'bounce') {
     const fills = { white: '#ffffff', silver: '#dfe5ec', gold: '#f6cf5c' };
     ctx.fillStyle = fills[it.surface] || '#fff';
     ctx.strokeStyle = it.surface === 'gold' ? '#b8860b' : '#8b97a8';
-    roundRect(ctx, -w / 2, -5, w, 10, 2); ctx.fill(); ctx.stroke();
+    roundRect(ctx, -w / 2, -5, w, 10, 2); ctx.fill(); shadowOff(ctx); ctx.stroke();
     ctx.fillStyle = 'rgba(100,116,139,0.35)';
     for (let x = -w / 2 + 6; x < w / 2 - 3; x += 9) { ctx.beginPath(); ctx.arc(x, (x * 7) % 5 > 0 ? -1.5 : 1.5, 0.9, 0, Math.PI * 2); ctx.fill(); }
   } else if (it.type === 'mirror') {
@@ -1376,7 +1679,7 @@ function drawPanel(ctx, it, px, glow) {
     g.addColorStop(0, '#cfe8ff'); g.addColorStop(0.45, '#ffffff'); g.addColorStop(0.55, '#b9dcff'); g.addColorStop(1, '#e8f4ff');
     ctx.fillStyle = g;
     ctx.strokeStyle = '#475569';
-    roundRect(ctx, -w / 2, -4, w, 8, 1.5); ctx.fill(); ctx.stroke();
+    roundRect(ctx, -w / 2, -4, w, 8, 1.5); ctx.fill(); shadowOff(ctx); ctx.stroke();
     ctx.strokeStyle = 'rgba(255,255,255,0.95)';
     ctx.beginPath();
     for (let x = -w / 2 + 8; x < w / 2 - 6; x += 16) { ctx.moveTo(x, 3); ctx.lineTo(x + 5, -3); }
@@ -1386,14 +1689,15 @@ function drawPanel(ctx, it, px, glow) {
     ctx.strokeStyle = '#94a3b8';
     ctx.setLineDash([4 * px + 2, 3 * px + 1]);
     ctx.fillRect(-w / 2, -3, w, 6);
+    shadowOff(ctx);
     ctx.strokeRect(-w / 2, -3, w, 6);
     ctx.setLineDash([]);
     ctx.fillStyle = '#52525b';
     ctx.beginPath(); ctx.arc(-w / 2, 0, 4.5, 0, Math.PI * 2); ctx.arc(w / 2, 0, 4.5, 0, Math.PI * 2); ctx.fill();
   } else {
-    ctx.fillStyle = '#111827';
-    ctx.strokeStyle = '#000';
-    roundRect(ctx, -w / 2, -4, w, 8, 1.5); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#0b0d12';
+    ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+    roundRect(ctx, -w / 2, -4, w, 8, 1.5); ctx.fill(); shadowOff(ctx); ctx.stroke();
   }
   if (glow && glow.I > 0.03) {
     const x0 = -w / 2 + glow.u0 * w, x1 = -w / 2 + glow.u1 * w;
@@ -1426,6 +1730,7 @@ function drawStroke(ctx, it) {
   ctx.lineWidth = it.width;
   ctx.lineCap = 'round';
   ctx.lineJoin = 'round';
+  glowOn(ctx, rgba(hexToRgb(it.color), 0.7), 10);
   strokePath(ctx, it.pts);
   ctx.stroke();
   ctx.restore();
@@ -1439,6 +1744,7 @@ function drawLink(ctx, it, items, px) {
   ctx.fillStyle = it.color;
   ctx.lineWidth = it.width;
   ctx.lineCap = 'round';
+  glowOn(ctx, rgba(hexToRgb(it.color), 0.55), 8);
   if (it.dash) ctx.setLineDash([it.width * 3, it.width * 2.2]);
   ctx.beginPath();
   ctx.moveTo(g.sx, g.sy);
@@ -1465,14 +1771,12 @@ function drawText(ctx, it, px) {
   const r = textRect(it);
   ctx.save();
   if (it.bg && it.bg !== 'transparent') {
-    ctx.shadowColor = 'rgba(17,24,39,0.12)';
-    ctx.shadowBlur = 8;
-    ctx.shadowOffsetY = 2;
+    shadowOn(ctx, 22, 8, 0.5);
     ctx.fillStyle = it.bg;
     roundRect(ctx, r.x, r.y, r.w, r.h, Math.min(10, it.size * 0.4));
     ctx.fill();
     ctx.shadowColor = 'transparent';
-    ctx.strokeStyle = 'rgba(17,24,39,0.10)';
+    ctx.strokeStyle = 'rgba(255,255,255,0.35)';
     ctx.lineWidth = Math.max(1, px);
     ctx.stroke();
   }
@@ -1488,11 +1792,13 @@ function drawCameraCone(ctx, it, segs) {
   const cp = cameraPoly(it, segs);
   const rgb = hexToRgb(it.color || '#ef4444');
   const g = ctx.createRadialGradient(cp.ox, cp.oy, 0, cp.ox, cp.oy, it.range);
-  g.addColorStop(0, rgba(rgb, 0.2));
-  g.addColorStop(1, rgba(rgb, 0.04));
+  g.addColorStop(0, rgba(rgb, 0.26));
+  g.addColorStop(0.6, rgba(rgb, 0.1));
+  g.addColorStop(1, rgba(rgb, 0.02));
   ctx.fillStyle = g;
   fillPoly(ctx, cp.pts);
-  ctx.strokeStyle = rgba(rgb, 0.55);
+  glowOn(ctx, rgba(rgb, 0.8), 8);
+  ctx.strokeStyle = rgba(rgb.map((v) => lerp(v, 255, 0.3)), 0.8);
   ctx.lineWidth = 1.5;
   ctx.setLineDash([8, 6]);
   const n = cp.pts.length;
@@ -1502,27 +1808,38 @@ function drawCameraCone(ctx, it, segs) {
   ctx.lineTo(cp.pts[n - 2], cp.pts[n - 1]);
   ctx.stroke();
   ctx.setLineDash([]);
+  shadowOff(ctx);
 }
 
-/* Full scene. o: {S, W, H, V, items, grid, gridSize, light, cones, mag, skipIds} */
+/* Full scene. o: {S, W, H, V, items, grid, gridSize, light, cones, mag} */
 function drawScene(ctx, o) {
   const { S, W, H, V, items } = o;
   const px = 1 / V.z;
+  SHS = S * clamp(V.z, 0.35, 1.4);
   ctx.setTransform(1, 0, 0, 1, 0, 0);
-  ctx.fillStyle = '#ffffff';
+  ctx.shadowColor = 'transparent';
+  const bg = ctx.createRadialGradient(W * S * 0.45, H * S * 0.4, 0, W * S * 0.5, H * S * 0.5, Math.max(W, H) * S * 0.8);
+  bg.addColorStop(0, '#454c5a');
+  bg.addColorStop(1, '#2c313b');
+  ctx.fillStyle = bg;
   ctx.fillRect(0, 0, W * S, H * S);
-  drawGrid(ctx, S, W, H, V, o.gridSize, o.grid, o.mag);
   const T = [S * V.z, S * V.x, S * V.y];
-  if (o.light) drawLightLayer(ctx, o.light, S, T);
-  ctx.setTransform(T[0], 0, 0, T[0], T[1], T[2]);
   const by = {};
   for (const it of items) (by[it.type] = by[it.type] || []).push(it);
   const L = (t) => by[t] || [];
+  const rooms = findRooms(L('wall'));
+  ctx.setTransform(T[0], 0, 0, T[0], T[1], T[2]);
+  drawFloors(ctx, rooms, px);
+  drawGrid(ctx, S, W, H, V, o.gridSize, o.grid, o.mag);
+  if (o.light) drawLightLayer(ctx, o.light, S, T);
+  ctx.setTransform(T[0], 0, 0, T[0], T[1], T[2]);
+  drawRoomLabels(ctx, rooms, px);
   if (o.cones) {
     const segs = o.light ? o.light.segs : buildSegs(items);
     for (const c of L('camera')) if (c.showCone) drawCameraCone(ctx, c, segs);
   }
-  drawWalls(ctx, L('wall'));
+  const opens = L('door').concat(L('window'));
+  drawWalls(ctx, L('wall'), opens);
   for (const it of L('window')) drawWindow(ctx, it, px);
   for (const it of L('door')) drawDoor(ctx, it, px);
   for (const it of L('stroke')) drawStroke(ctx, it);
@@ -1534,6 +1851,7 @@ function drawScene(ctx, o) {
   for (const it of L('camera')) drawCamera(ctx, it, px);
   for (const it of L('link')) drawLink(ctx, it, items, px);
   for (const it of L('text')) drawText(ctx, it, px);
+  shadowOff(ctx);
 }
 
 /* =====================================================================
@@ -1552,8 +1870,8 @@ const snapFx = { x: 0, y: 0, tx: 0, ty: 0, pulse: 0, show: false, kind: 'grid' }
 const ripples = [];
 const pointers = new Map();
 let needs = true, lightKey = null, lightRes = null;
-const penStyle = { color: '#e11d48', width: 3, opacity: 1 };
-const wallStyle = { thick: 15, color: '#1f2937' };
+const penStyle = { color: '#f472b6', width: 3, opacity: 1 };
+const wallStyle = { thick: 15, color: '#e9edf5' };
 
 const byId = (id) => ED.items.find((i) => i.id === id);
 const snapOn = () => ED.settings.snap && !altDown;
@@ -1572,6 +1890,7 @@ function commit() {
   ED.hIdx = ED.history.length - 1;
   syncUndo();
   scheduleSave();
+  checkRooms(true);
 }
 let commitT = null;
 function commitSoon() { clearTimeout(commitT); commitT = setTimeout(commit, 350); }
@@ -1581,6 +1900,7 @@ function restore() {
   if (ED.sel && !byId(ED.sel)) { ED.sel = null; closePopup(); } else if (popupFor) refreshPopup();
   touch();
   syncUndo();
+  checkRooms(false);
 }
 function undo() { clearTimeout(commitT); commit(); if (ED.hIdx > 0) { ED.hIdx--; restore(); } }
 function redo() { if (ED.hIdx < ED.history.length - 1) { ED.hIdx++; restore(); } }
@@ -1592,7 +1912,7 @@ function scheduleSave() { clearTimeout(saveT); saveT = setTimeout(() => saveNow(
 function saveNow(withThumb) {
   if (!ED.proj) return;
   clearTimeout(saveT);
-  ED.proj.data = { items: ED.items, settings: ED.settings, view: ED.view };
+  ED.proj.data = { v: 2, items: ED.items, settings: ED.settings, view: ED.view };
   ED.proj.updated = Date.now();
   if (withThumb) { try { ED.proj.thumb = makeThumb(ED.items, ED.settings); } catch (_) { /* ignore */ } }
   persistProjects();
@@ -1634,7 +1954,21 @@ function autoLabel(it) {
   else if (it.type === 'lamp') it.label = ['Key', 'Fill', 'Back', 'Kicker'][n] || 'Lamp ' + (n + 1);
   else if (it.type === 'person') it.label = n ? 'Talent ' + (n + 1) : 'Talent';
 }
-function ripple(x, y) { ripples.push({ x, y, t0: performance.now() }); }
+function ripple(x, y) { ripples.push({ kind: 'point', x, y, t0: performance.now(), dur: 520 }); }
+function wallRipple(w) { ripples.push({ kind: 'wall', w: { x1: w.x1, y1: w.y1, x2: w.x2, y2: w.y2, thick: w.thick }, t0: performance.now(), dur: 750 }); }
+function roomRipple(r) { ripples.push({ kind: 'room', r, t0: performance.now(), dur: 1500 }); }
+let roomCount = 0;
+/* Celebrate when a new closed room appears. */
+function checkRooms(effect) {
+  const rooms = findRooms(ED.items.filter((i) => i.type === 'wall'));
+  if (effect && rooms.length > roomCount) {
+    const old = new Set((ED.roomKeys || []));
+    const fresh = rooms.filter((r) => !old.has(r.key));
+    for (const r of (fresh.length ? fresh : rooms.slice(-1))) roomRipple(r);
+  }
+  roomCount = rooms.length;
+  ED.roomKeys = rooms.map((r) => r.key);
+}
 
 /* ---------- snapping ---------- */
 function gridSnap(x, y) { const g = ED.settings.gridSize; return { x: Math.round(x / g) * g, y: Math.round(y / g) * g }; }
@@ -1811,7 +2145,7 @@ function displayItems() {
 }
 function magActive() {
   if (!pointer.in || !snapOn()) return false;
-  if (drag) return drag.mode === 'room' || (drag.mode === 'move' && drag.moved) || drag.mode === 'handle';
+  if (drag) return drag.mode === 'room' || drag.mode === 'wall' || (drag.mode === 'move' && drag.moved) || drag.mode === 'handle';
   return ED.tool === 'wall' || ED.tool === 'room' || ED.tool === 'place' || ED.tool === 'text';
 }
 function render() {
@@ -1832,7 +2166,8 @@ function outline(it, items, color, dash) {
   const px = 1 / ED.view.z;
   ctx.save();
   ctx.strokeStyle = color;
-  ctx.lineWidth = 1.6 * px;
+  ctx.lineWidth = 1.8 * px;
+  glowOn(ctx, color, 12);
   ctx.setLineDash(dash ? [6 * px, 4 * px] : []);
   if (it.type === 'link') {
     const g = linkGeom(it, items);
@@ -1857,8 +2192,9 @@ function drawHandles(it) {
   ctx.save();
   if (it.type === 'lamp' || it.type === 'camera') {
     const a = it.rot * D2R, half = (it.type === 'lamp' ? it.beam : it.fov) * D2R / 2;
-    ctx.strokeStyle = 'rgba(109,94,252,0.55)';
+    ctx.strokeStyle = 'rgba(179,168,255,0.75)';
     ctx.lineWidth = 1.4 * px;
+    glowOn(ctx, 'rgba(139,124,255,0.8)', 8);
     ctx.setLineDash([5 * px, 5 * px]);
     ctx.beginPath();
     ctx.moveTo(it.x, it.y); ctx.lineTo(hs[0].x, hs[0].y);
@@ -1867,6 +2203,7 @@ function drawHandles(it) {
     ctx.moveTo(it.x, it.y); ctx.lineTo(hs[2].x, hs[2].y);
     ctx.stroke();
     ctx.setLineDash([]);
+    shadowOff(ctx);
   } else if (it.type === 'person' || it.type === 'table') {
     const m = hs.find((h) => h.k === 'rot');
     const c = it.type === 'table' ? fromLocal(it, 0, -it.h / 2) : { x: it.x, y: it.y };
@@ -1879,10 +2216,9 @@ function drawHandles(it) {
     ctx.beginPath();
     ctx.arc(h.x, h.y, r, 0, Math.PI * 2);
     ctx.fillStyle = h.main ? ACCENT : '#fff';
-    ctx.shadowColor = 'rgba(0,0,0,0.25)';
-    ctx.shadowBlur = 4;
+    glowOn(ctx, 'rgba(155,140,255,0.95)', h.main ? 16 : 10);
     ctx.fill();
-    ctx.shadowBlur = 0;
+    shadowOff(ctx);
     ctx.lineWidth = 2 * px;
     ctx.strokeStyle = h.main ? '#fff' : ACCENT;
     ctx.stroke();
@@ -1891,10 +2227,17 @@ function drawHandles(it) {
 }
 function dimPill(sx, sy, text) {
   ctx.font = '700 12px ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif';
-  const w = ctx.measureText(text).width + 16;
-  ctx.fillStyle = ACCENT;
-  roundRect(ctx, sx - w / 2, sy - 11, w, 22, 11);
+  const w = ctx.measureText(text).width + 18;
+  const g = ctx.createLinearGradient(sx - w / 2, 0, sx + w / 2, 0);
+  g.addColorStop(0, '#9b8cff');
+  g.addColorStop(1, '#4f8cff');
+  ctx.fillStyle = g;
+  roundRect(ctx, sx - w / 2, sy - 12, w, 24, 12);
+  ctx.shadowColor = 'rgba(139,124,255,0.85)';
+  ctx.shadowBlur = 16 * S;
   ctx.fill();
+  ctx.shadowBlur = 0;
+  ctx.shadowColor = 'transparent';
   ctx.fillStyle = '#fff';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
@@ -1926,10 +2269,10 @@ function drawOverlays(items) {
 
   // wall preview
   if (ED.tool === 'wall' && wallChain && pointer.in) {
-    const s = ED.cursorSnap || wallChain.last;
+    const s = ED.cursorSnap || wallChain.last, f = wallFrom();
     ctx.save();
-    ctx.globalAlpha = 0.45;
-    drawWalls(ctx, [{ x1: wallChain.last.x, y1: wallChain.last.y, x2: s.x, y2: s.y, thick: wallStyle.thick, color: wallStyle.color }]);
+    ctx.globalAlpha = 0.55;
+    drawWalls(ctx, [{ x1: f.x, y1: f.y, x2: s.x, y2: s.y, thick: wallStyle.thick, color: wallStyle.color }]);
     ctx.restore();
   }
   if (drag && drag.mode === 'room') {
@@ -1961,12 +2304,14 @@ function drawOverlays(items) {
     }
   }
 
+  drawWorldRipples(px);
+
   // ---- screen space ----
   ctx.setTransform(S, 0, 0, S, 0, 0);
   if (ED.tool === 'wall' && wallChain && pointer.in) {
-    const s = ED.cursorSnap || wallChain.last;
-    const L = dist(wallChain.last.x, wallChain.last.y, s.x, s.y);
-    if (L > 1) { const m = toScreen((wallChain.last.x + s.x) / 2, (wallChain.last.y + s.y) / 2); dimPill(m.x, m.y - 22, fmtM(Math.round(L))); }
+    const s = ED.cursorSnap || wallChain.last, f = wallFrom();
+    const L = dist(f.x, f.y, s.x, s.y);
+    if (L > 1) { const m = toScreen((f.x + s.x) / 2, (f.y + s.y) / 2); dimPill(m.x, m.y - 22, fmtM(Math.round(L))); }
   }
   if (drag && drag.mode === 'room') {
     const a = drag.a, b = drag.b;
@@ -1976,20 +2321,41 @@ function drawOverlays(items) {
   if (snapFx.show && pointer.in && magActive()) {
     const p = toScreen(snapFx.x, snapFx.y);
     const end = snapFx.kind === 'end';
-    const col = end ? [249, 115, 22] : [109, 94, 252];
+    const col = end ? [251, 146, 60] : [139, 124, 255];
     const r = 7 + 7 * snapFx.pulse;
+    ctx.save();
+    ctx.shadowColor = rgba(col, 0.95);
+    ctx.shadowBlur = (10 + 12 * snapFx.pulse) * S;
     ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
-    ctx.fillStyle = rgba(col, 0.14 + 0.1 * snapFx.pulse); ctx.fill();
-    ctx.lineWidth = 2; ctx.strokeStyle = rgba(col, 0.9); ctx.stroke();
-    ctx.beginPath(); ctx.arc(p.x, p.y, 3.2, 0, Math.PI * 2); ctx.fillStyle = rgba(col, 1); ctx.fill();
+    ctx.fillStyle = rgba(col, 0.16 + 0.12 * snapFx.pulse); ctx.fill();
+    ctx.lineWidth = 2; ctx.strokeStyle = rgba(col.map((v) => lerp(v, 255, 0.35)), 0.95); ctx.stroke();
+    ctx.beginPath(); ctx.arc(p.x, p.y, 3.4, 0, Math.PI * 2); ctx.fillStyle = '#fff'; ctx.fill();
+    ctx.restore();
   }
   const now = performance.now();
   for (const rp of ripples) {
-    const k = (now - rp.t0) / 480;
-    if (k >= 1) continue;
+    if (rp.kind !== 'point') continue;
+    const k = (now - rp.t0) / rp.dur;
+    if (k >= 1 || k < 0) continue;
     const p = toScreen(rp.x, rp.y);
-    ctx.beginPath(); ctx.arc(p.x, p.y, 6 + 30 * (1 - Math.pow(1 - k, 3)), 0, Math.PI * 2);
-    ctx.strokeStyle = `rgba(109,94,252,${(1 - k) * 0.7})`; ctx.lineWidth = 2.5 * (1 - k) + 0.5; ctx.stroke();
+    ctx.save();
+    ctx.shadowColor = 'rgba(255,255,255,0.9)';
+    ctx.shadowBlur = 14 * S;
+    ctx.beginPath(); ctx.arc(p.x, p.y, 6 + 34 * (1 - Math.pow(1 - k, 3)), 0, Math.PI * 2);
+    ctx.strokeStyle = `rgba(255,255,255,${(1 - k) * 0.55})`; ctx.lineWidth = 2.5 * (1 - k) + 0.5; ctx.stroke();
+    ctx.restore();
+  }
+  // room-complete badge
+  for (const rp of ripples) {
+    if (rp.kind !== 'room') continue;
+    const k = (now - rp.t0) / rp.dur;
+    if (k >= 1 || k < 0) continue;
+    const p = toScreen(rp.r.cx, rp.r.cy);
+    const a = k < 0.15 ? k / 0.15 : k > 0.75 ? (1 - k) / 0.25 : 1;
+    ctx.save();
+    ctx.globalAlpha = a;
+    dimPill(p.x, p.y - 26 - 18 * k, '✓ Ruimte klaar · ' + fmtArea(rp.r.area));
+    ctx.restore();
   }
   // connector dot on hovered / selected text boxes
   if (ED.tool === 'select' && (!drag || drag.mode === 'link')) {
@@ -2000,8 +2366,52 @@ function drawOverlays(items) {
       const d = textDot(t);
       const hot = dist(d.x, d.y, pointer.x, pointer.y) < 11 || (drag && drag.from === id);
       ctx.beginPath(); ctx.arc(d.x, d.y, hot ? 8 : 6.5, 0, Math.PI * 2);
-      ctx.fillStyle = ACCENT; ctx.shadowColor = 'rgba(109,94,252,0.6)'; ctx.shadowBlur = hot ? 10 : 4; ctx.fill(); ctx.shadowBlur = 0;
+      ctx.fillStyle = ACCENT; ctx.shadowColor = 'rgba(155,140,255,0.95)'; ctx.shadowBlur = (hot ? 18 : 10) * S; ctx.fill(); ctx.shadowBlur = 0;
       ctx.lineWidth = 2; ctx.strokeStyle = '#fff'; ctx.stroke();
+    }
+  }
+}
+function drawWorldRipples(px) {
+  const now = performance.now();
+  for (const rp of ripples) {
+    const k = (now - rp.t0) / rp.dur;
+    if (k >= 1 || k < 0) continue;
+    const e = 1 - Math.pow(1 - k, 3);
+    if (rp.kind === 'wall') {
+      const w = rp.w;
+      ctx.save();
+      ctx.lineCap = 'round';
+      glowOn(ctx, 'rgba(255,255,255,0.9)', 22);
+      ctx.strokeStyle = `rgba(255,255,255,${0.22 * (1 - k)})`;
+      ctx.lineWidth = w.thick + 70 * e;
+      ctx.beginPath(); ctx.moveTo(w.x1, w.y1); ctx.lineTo(w.x2, w.y2); ctx.stroke();
+      ctx.strokeStyle = `rgba(255,255,255,${0.5 * (1 - k)})`;
+      ctx.lineWidth = w.thick + 4 * px;
+      ctx.stroke();
+      ctx.restore();
+    } else if (rp.kind === 'room') {
+      const r = rp.r;
+      const path = () => { ctx.beginPath(); r.pts.forEach(([x, y], i) => (i ? ctx.lineTo(x, y) : ctx.moveTo(x, y))); ctx.closePath(); };
+      ctx.save();
+      // floor flash
+      path();
+      const g = ctx.createRadialGradient(r.cx, r.cy, 0, r.cx, r.cy, Math.sqrt(r.area) * (0.3 + 1.2 * e));
+      g.addColorStop(0, `rgba(255,255,255,${0.32 * (1 - k)})`);
+      g.addColorStop(0.7, `rgba(179,168,255,${0.22 * (1 - k)})`);
+      g.addColorStop(1, 'rgba(179,168,255,0)');
+      ctx.fillStyle = g;
+      ctx.fill();
+      // glowing perimeter that traces around the room
+      glowOn(ctx, 'rgba(155,140,255,1)', 24);
+      ctx.strokeStyle = `rgba(214,208,255,${0.95 * (1 - k * k)})`;
+      ctx.lineWidth = 3.5 * px;
+      ctx.lineJoin = 'round';
+      let per = 0;
+      for (let i = 0; i < r.pts.length; i++) { const a = r.pts[i], b = r.pts[(i + 1) % r.pts.length]; per += dist(a[0], a[1], b[0], b[1]); }
+      ctx.setLineDash([per * Math.min(1, e * 1.6), per]);
+      path();
+      ctx.stroke();
+      ctx.restore();
     }
   }
 }
@@ -2021,7 +2431,7 @@ function frame() {
     }
   }
   const now = performance.now();
-  while (ripples.length && now - ripples[0].t0 > 500) ripples.shift();
+  for (let i = ripples.length - 1; i >= 0; i--) if (now - ripples[i].t0 > ripples[i].dur) ripples.splice(i, 1);
   if (ripples.length) active = true;
   if (!$('#editor').classList.contains('hidden') && (active || needs)) { needs = false; render(); }
   requestAnimationFrame(frame);
@@ -2063,7 +2473,7 @@ function fitView() {
    ===================================================================== */
 const HINTS = {
   hand: 'Sleep om te verschuiven · scroll of knijp om te zoomen',
-  wall: 'Klik om muurpunten te zetten · dubbelklik, Enter of rechtsklik om te stoppen · Shift = hoeken van 15°',
+  wall: 'Sleep om een muur te trekken, of klik punt voor punt · dubbelklik, Enter of Esc om te stoppen · Shift = hoeken van 15°',
   room: 'Sleep van hoek naar hoek om een ruimte te tekenen',
   text: 'Klik om een tekstvak te plaatsen',
   pen: 'Teken vrij op het canvas',
@@ -2186,7 +2596,7 @@ cv.addEventListener('pointerdown', (e) => {
   }
   switch (ED.tool) {
     case 'select': downSelect(e, p, w); break;
-    case 'wall': downWall(e, w); break;
+    case 'wall': downWall(e, p, w); break;
     case 'room': { const s = snapPoint(w); drag = { mode: 'room', a: s, b: s }; ripple(s.x, s.y); break; }
     case 'pen': drag = { mode: 'pen', pts: [[w.x, w.y]] }; break;
     case 'text': {
@@ -2229,22 +2639,47 @@ function downSelect(e, p, w) {
   closePopup();
   drag = { mode: 'pan', sx: p.x, sy: p.y, vx: ED.view.x, vy: ED.view.y, moved: false };
 }
-function downWall(e, w) {
+function wallFrom() {
+  return drag && drag.mode === 'wall' && drag.moved && drag.fresh ? drag.s : wallChain.last;
+}
+function addWallSeg(t) {
+  if (!wallChain || dist(t.x, t.y, wallChain.last.x, wallChain.last.y) < 1) return;
+  const w = makeWall(wallChain.last, t);
+  addItem(w);
+  wallRipple(w);
+  ripple(t.x, t.y);
+  wallChain.n++;
+  wallChain.lastT = performance.now();
+  if (dist(t.x, t.y, wallChain.start.x, wallChain.start.y) < 1) { finishWall(); return; }
+  wallChain.last = { x: t.x, y: t.y };
+}
+function downWall(e, p, w) {
   const s = wallTarget(w, e.shiftKey);
-  const now = performance.now();
-  if (wallChain) {
-    if (now - wallChain.lastT < 350 && dist(s.x, s.y, wallChain.last.x, wallChain.last.y) < 1) { finishWall(); return; }
-    if (dist(s.x, s.y, wallChain.last.x, wallChain.last.y) < 1) return;
-    addItem(makeWall(wallChain.last, s));
-    ripple(s.x, s.y);
-    wallChain.n++;
-    if (dist(s.x, s.y, wallChain.start.x, wallChain.start.y) < 1) { finishWall(); return; }
-    wallChain.last = { x: s.x, y: s.y };
-    wallChain.lastT = now;
-  } else {
-    wallChain = { start: { x: s.x, y: s.y }, last: { x: s.x, y: s.y }, lastT: now, n: 0 };
+  const hadChain = !!wallChain;
+  const fresh = hadChain && dist(s.x, s.y, wallChain.last.x, wallChain.last.y) >= 1;
+  if (!hadChain) {
+    wallChain = { start: { x: s.x, y: s.y }, last: { x: s.x, y: s.y }, lastT: 0, n: 0 };
     ripple(s.x, s.y);
   }
+  ED.cursorSnap = s;
+  drag = { mode: 'wall', s: { x: s.x, y: s.y }, sx: p.x, sy: p.y, moved: false, hadChain, fresh, t: performance.now() };
+}
+function upWall(d) {
+  if (!wallChain) return;
+  if (d.moved) {
+    const t = ED.cursorSnap || d.s;
+    if (d.fresh) {
+      // dragging from somewhere else starts a new wall run there
+      finishWall();
+      wallChain = { start: { x: d.s.x, y: d.s.y }, last: { x: d.s.x, y: d.s.y }, lastT: 0, n: 0 };
+    }
+    addWallSeg(t);
+    return;
+  }
+  if (!d.hadChain) { wallChain.lastT = d.t; return; }
+  const last = wallChain.last;
+  if (d.t - wallChain.lastT < 350 && dist(d.s.x, d.s.y, last.x, last.y) < 1) { finishWall(); return; }
+  addWallSeg(d.s);
 }
 cv.addEventListener('pointermove', (e) => {
   const p = evPos(e);
@@ -2273,6 +2708,14 @@ cv.addEventListener('pointermove', (e) => {
     case 'move': moveDrag(p, w); break;
     case 'handle': handleDrag(w, e.shiftKey); break;
     case 'room': drag.b = snapPoint(w); setSnapFx(drag.b); break;
+    case 'wall': {
+      if (!drag.moved && dist(p.x, p.y, drag.sx, drag.sy) > 6) drag.moved = true;
+      const from = drag.fresh && drag.moved ? drag.s : wallChain.last;
+      const t = e.shiftKey ? angleSnapFrom(from, w) : snapPoint(w);
+      ED.cursorSnap = t;
+      setSnapFx(t);
+      break;
+    }
     case 'pen': {
       const l = drag.pts[drag.pts.length - 1];
       if (dist(l[0], l[1], w.x, w.y) > 2 / ED.view.z) drag.pts.push([w.x, w.y]);
@@ -2423,11 +2866,12 @@ function endPointer(e) {
       snapFx.show = false;
       break;
     case 'handle': commit(); snapFx.show = false; break;
+    case 'wall': upWall(d); break;
     case 'room': {
       const a = d.a, b = d.b;
       if (Math.abs(b.x - a.x) >= 10 && Math.abs(b.y - a.y) >= 10) {
         const q = [[a.x, a.y, b.x, a.y], [b.x, a.y, b.x, b.y], [b.x, b.y, a.x, b.y], [a.x, b.y, a.x, a.y]];
-        for (const r of q) ED.items.push(makeWall({ x: r[0], y: r[1] }, { x: r[2], y: r[3] }));
+        for (const r of q) { const nw = makeWall({ x: r[0], y: r[1] }, { x: r[2], y: r[3] }); ED.items.push(nw); wallRipple(nw); }
         touch(); commit();
         ripple(a.x, a.y); ripple(b.x, b.y); ripple(a.x, b.y); ripple(b.x, a.y);
       }
@@ -2581,7 +3025,7 @@ $('#pname').addEventListener('keydown', (e) => { if (e.key === 'Enter') e.target
    Palette (click = tool, drag = drop onto the canvas)
    ===================================================================== */
 function buildPalette() {
-  $('#palette').innerHTML = PALETTE.map((g, gi) => `<div class="pgroup"><h4>${g.title}</h4><div class="pitems">${g.items.map((p, i) =>
+  $('#palette').innerHTML = PALETTE.map((g, gi) => `<div class="pgroup" style="--gc:${g.color}"><h4>${g.title}</h4><div class="pitems">${g.items.map((p, i) =>
     `<div class="pitem" data-g="${gi}" data-i="${i}" title="${esc(p.label)}${p.key ? ' (' + p.key + ')' : ''}">${p.key ? `<span class="k">${p.key}</span>` : ''}${p.icon}<span>${esc(p.label)}</span></div>`).join('')}</div></div>`).join('');
 }
 let palDrag = null;
@@ -2649,7 +3093,8 @@ window.addEventListener('pointercancel', endPalDrag);
 const PEOPLE_COLORS = ['#6366f1', '#0ea5e9', '#10b981', '#f59e0b', '#ef4444', '#ec4899', '#8b5cf6', '#374151'];
 const WOOD_COLORS = ['#d6b48a', '#b8875a', '#8b5a2b', '#e5e7eb', '#9ca3af', '#4b5563', '#fef3c7', '#1f2937'];
 const CAM_COLORS = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#06b6d4', '#3b82f6', '#8b5cf6', '#ec4899'];
-const WALL_COLORS = ['#1f2937', '#4b5563', '#9ca3af', '#78350f', '#1e3a8a', '#7f1d1d'];
+const WALL_COLORS = ['#e9edf5', '#cbd5e1', '#94a3b8', '#fcd9b6', '#a5b4fc', '#5eead4', '#f9a8d4', '#1f2937'];
+const LINE_COLORS = ['#e2e8f0', '#ffffff', '#fda4af', '#fdba74', '#fde047', '#86efac', '#7dd3fc', '#c4b5fd', '#f472b6', '#111827'];
 const TEXT_COLORS = ['#111827', '#4b5563', '#ef4444', '#f97316', '#16a34a', '#2563eb', '#7c3aed', '#db2777'];
 const BG_COLORS = ['#fff4bf', '#ffffff', '#dbeafe', '#dcfce7', '#fce7f3', '#ede9fe', '#fee2e2', '#111827'];
 const cmFmt = (v) => fmtM(Math.round(v));
@@ -2692,8 +3137,8 @@ function fieldsFor(it) {
       sw('color', 'Kleur', WALL_COLORS),
     ];
     case 'text': return [{ k: 'text', t: 'textarea', l: 'Tekst' }, { k: 'size', t: 'range', l: 'Lettergrootte', min: 10, max: 72, step: 1, fmt: (v) => v + ' pt' }, { k: 'bold', t: 'toggle', l: 'Vet' }, sw('color', 'Tekstkleur', TEXT_COLORS), sw('bg', 'Achtergrond', BG_COLORS, true)];
-    case 'link': return [sw('color', 'Kleur', TEXT_COLORS), { k: 'width', t: 'range', l: 'Dikte', min: 1, max: 10, step: 0.5, fmt: (v) => v + ' px' }, { k: 'head', t: 'seg', l: 'Uiteinde', opts: [['none', 'Geen'], ['arrow', 'Pijl'], ['dot', 'Punt']] }, { k: 'curve', t: 'range', l: 'Kromming', min: -1, max: 1, step: 0.05, fmt: (v) => Math.round(v * 100) + '%' }, { k: 'dash', t: 'toggle', l: 'Stippellijn' }];
-    case 'stroke': return [sw('color', 'Kleur', TEXT_COLORS.concat(['#e11d48'])), { k: 'width', t: 'range', l: 'Dikte', min: 1, max: 24, step: 1, fmt: (v) => v + ' px' }, { k: 'opacity', t: 'range', l: 'Dekking', min: 0.1, max: 1, step: 0.05, fmt: (v) => Math.round(v * 100) + '%' }];
+    case 'link': return [sw('color', 'Kleur', LINE_COLORS), { k: 'width', t: 'range', l: 'Dikte', min: 1, max: 10, step: 0.5, fmt: (v) => v + ' px' }, { k: 'head', t: 'seg', l: 'Uiteinde', opts: [['none', 'Geen'], ['arrow', 'Pijl'], ['dot', 'Punt']] }, { k: 'curve', t: 'range', l: 'Kromming', min: -1, max: 1, step: 0.05, fmt: (v) => Math.round(v * 100) + '%' }, { k: 'dash', t: 'toggle', l: 'Stippellijn' }];
+    case 'stroke': return [sw('color', 'Kleur', LINE_COLORS), { k: 'width', t: 'range', l: 'Dikte', min: 1, max: 24, step: 1, fmt: (v) => v + ' px' }, { k: 'opacity', t: 'range', l: 'Dekking', min: 0.1, max: 1, step: 0.05, fmt: (v) => Math.round(v * 100) + '%' }];
     default: return [];
   }
 }
@@ -2748,7 +3193,7 @@ function buildPopup(it) {
   const fields = fieldsFor(it);
   const hasLabel = !!LABEL_TYPES[it.type];
   popup.innerHTML =
-    `<div class="pp-head"><div class="pp-ic" style="background:${TYPE_COLORS[it.type] || ACCENT}">${iconFor(it)}</div>` +
+    `<div class="pp-head"><div class="pp-ic" style="--icg:${TYPE_COLORS[it.type] || ACCENT}99;background:linear-gradient(135deg, ${shade(TYPE_COLORS[it.type] || ACCENT, 0.3)}, ${TYPE_COLORS[it.type] || ACCENT})">${iconFor(it)}</div>` +
     `<div class="pp-title"><small>${esc(TYPE_NAMES[it.type] || it.type)}</small>${hasLabel ? `<input id="ppLabel" value="${esc(it.label)}" placeholder="Naam toevoegen…" spellcheck="false">` : `<div style="font-weight:700;font-size:15px">Eigenschappen</div>`}</div>` +
     `<button class="icon-btn pp-x" id="ppClose" title="Sluiten">${I.close}</button></div>` +
     `<div class="pp-body">${fields.map((f, i) => fieldHtml(f, it, i)).join('')}</div>` +
@@ -2946,7 +3391,7 @@ function toast(msg) {
    ===================================================================== */
 const aim = (it, tx, ty) => { it.rot = normDeg(Math.round(Math.atan2(ty - it.y, tx - it.x) * R2D)); return it; };
 function wallsRect(x0, y0, x1, y1, t) {
-  return [[x0, y0, x1, y0], [x1, y0, x1, y1], [x1, y1, x0, y1], [x0, y1, x0, y0]].map((q) => ({ id: uid(), type: 'wall', x1: q[0], y1: q[1], x2: q[2], y2: q[3], thick: t, color: '#1f2937' }));
+  return [[x0, y0, x1, y0], [x1, y0, x1, y1], [x1, y1, x0, y1], [x0, y1, x0, y0]].map((q) => ({ id: uid(), type: 'wall', x1: q[0], y1: q[1], x2: q[2], y2: q[3], thick: t, color: '#e9edf5' }));
 }
 function tplStudio() {
   const items = wallsRect(0, 0, 800, 600, 20);
@@ -3029,7 +3474,7 @@ function confirmBox(title, text, okLabel, ok) {
   });
 }
 function createProject(name, items, open) {
-  const p = { id: uid(), name, created: Date.now(), updated: Date.now(), data: { items, settings: clone(DEFAULT_SETTINGS), view: null }, thumb: null };
+  const p = { id: uid(), name, created: Date.now(), updated: Date.now(), data: { v: 2, items, settings: clone(DEFAULT_SETTINGS), view: null }, thumb: null };
   try { p.thumb = makeThumb(items, p.data.settings); } catch (_) { /* ignore */ }
   loadProjects().push(p);
   persistProjects();
@@ -3116,9 +3561,17 @@ function openProject(id) {
   ED.proj = p;
   const d = p.data || {};
   ED.items = clone(d.items || []);
+  if (!(d.v >= 2)) {
+    for (const it of ED.items) {
+      if (it.type === 'wall' && it.color === '#1f2937') it.color = '#e9edf5';
+      if (it.type === 'link' && it.color === '#111827') it.color = '#e2e8f0';
+    }
+  }
   ED.settings = Object.assign(clone(DEFAULT_SETTINGS), d.settings || {});
   ED.sel = null; ED.hover = null;
   ED.history = [JSON.stringify(ED.items)]; ED.hIdx = 0;
+  ED.roomKeys = [];
+  checkRooms(false);
   anim.clear(); wallChain = null; drag = null;
   closePopup();
   $('#dash').classList.add('hidden');

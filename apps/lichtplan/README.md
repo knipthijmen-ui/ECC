@@ -10,7 +10,7 @@ Open `index.html` in een moderne browser (Chrome, Edge, Safari of Firefox). Proj
 
 - **Dashboard** met projecten (nieuw, hernoemen, dupliceren, exporteren, verwijderen) en sjablonen: leeg, studio, interview.
 - **Wit canvas met puntenraster** (10, 25, 50 of 100 cm) en snappen met een vergrootglas-effect op de punten. Houd `Alt` ingedrukt om tijdelijk vrij te bewegen.
-- **Muren, ruimtes, deuren en ramen**: deuren en ramen klikken vast op de dichtstbijzijnde muur en maken een opening waar licht doorheen gaat.
+- **Muren, ruimtes, deuren en ramen**: sleep of klik om muren te trekken; een afgesloten ruimte krijgt automatisch een vloer met kleurverloop en oppervlakte. deuren en ramen klikken vast op de dichtstbijzijnde muur en maken een opening waar licht doorheen gaat.
 - **Objecten** om in het veld te slepen: persoon (met kijkrichting), tafel, camera, fresnel, LED-paneel, softbox, piepschuim/bounce, spiegel, diffusiescherm en floppy.
 - **Lichtsimulatie**: lampen schijnen met een bundel die je met handvatten groter, kleiner, verder of anders gericht maakt. Spiegels reflecteren de bundel, piepschuim kaatst zacht terug (wit, zilver of goud), diffusie maakt het licht zachter en breder, muren, mensen, tafels en floppy's werpen schaduw.
 - **Camerabeeld**: beeldkegel met handvatten en lenskeuze (16–135 mm full frame).
