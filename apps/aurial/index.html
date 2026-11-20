@@ -3912,7 +3912,7 @@ function buildPopup(it) {
     `<div class="pp-head"><div class="pp-ic" style="--icg:${TYPE_COLORS[it.type] || ACCENT}99;background:linear-gradient(135deg, ${shade(TYPE_COLORS[it.type] || ACCENT, 0.3)}, ${TYPE_COLORS[it.type] || ACCENT})">${iconFor(it)}</div>` +
     `<div class="pp-title"><small>${esc(TYPE_NAMES[it.type] || it.type)}</small>${hasLabel ? `<input id="ppLabel" value="${esc(it.label)}" placeholder="Naam toevoegen…" spellcheck="false">` : `<div style="font-weight:700;font-size:15px">Eigenschappen</div>`}</div>` +
     `<button class="icon-btn pp-x" id="ppClose" title="Sluiten">${I.close}</button></div>` +
-    `<div class="pp-body">${it.type === 'lamp' || it.type === 'camera' ? '<div class="mv" id="mvHost"><div class="mv-hud" id="mvHud"></div><div class="mv-tip">Sleep de bolletjes · sleep de achtergrond om te draaien</div></div>' : ''}${fields.map((f, i) => fieldHtml(f, it, i)).join('')}</div>` +
+    `<div class="pp-body">${it.type === 'lamp' || it.type === 'camera' ? '<div class="mv" id="mvHost"><div class="mv-hud" id="mvHud"></div><div class="mv-tip">Sleep de bolletjes · sleep de rest om te draaien</div></div>' : ''}${fields.map((f, i) => fieldHtml(f, it, i)).join('')}</div>` +
     `<div class="pp-foot">${it.type !== 'link' ? `<button class="btn" id="ppDup">${I.copy}Dupliceer</button>` : ''}<button class="btn del" id="ppDel">${I.trash}Verwijder</button></div>`;
   $('#ppClose', popup).onclick = closePopup;
   $('#ppDel', popup).onclick = () => deleteItem(it.id);
@@ -5151,6 +5151,14 @@ function mvDraw() {
   MV.pick = [];
   const H = mvHeight(it), a = it.rot * D2R, tilt = mvTilt(it) * D2R;
   const basic = (c) => new T.MeshBasicMaterial({ color: c, toneMapped: false });
+  const ball = (c) => {
+    const g = new T.Group();
+    const top = (m) => { m.renderOrder = 10; m.material.depthTest = false; m.material.transparent = true; return m; };
+    g.add(top(new T.Mesh(new T.SphereGeometry(8.5, 20, 14), new T.MeshBasicMaterial({ color: '#ffffff', toneMapped: false, opacity: 0.95 }))));
+    g.add(top(new T.Mesh(new T.SphereGeometry(6.8, 24, 16), new T.MeshBasicMaterial({ color: c, toneMapped: false }))));
+    g.children[1].renderOrder = 11;
+    return g;
+  };
   const grab = (mesh, k) => {
     sc.add(mesh);
     mesh.updateMatrixWorld(true);
@@ -5161,11 +5169,11 @@ function mvDraw() {
     MV.pick.push(hit);
   };
   if (mvCanH(it)) {
-    const stem = new T.Mesh(new T.CylinderGeometry(0.7, 0.7, 34, 8), basic('#8b7cff'));
-    stem.position.set(0, H + 26, 0);
+    const stem = new T.Mesh(new T.CylinderGeometry(0.7, 0.7, 26, 8), basic('#8b7cff'));
+    stem.position.set(0, H + 20, 0);
     sc.add(stem);
-    const up = new T.Mesh(new T.ConeGeometry(4.5, 9, 16), basic('#b3a8ff'));
-    up.position.set(0, H + 52, 0);
+    const up = ball('#8b7cff');
+    up.position.set(0, H + 34, 0);
     grab(up, 'h');
   }
   if (mvCanPan(it)) {
@@ -5173,7 +5181,7 @@ function mvDraw() {
     ring.rotation.x = Math.PI / 2;
     ring.position.set(0, H, 0);
     sc.add(ring);
-    const kn = new T.Mesh(new T.SphereGeometry(5.5, 20, 14), basic('#7dd3fc'));
+    const kn = ball('#38bdf8');
     kn.position.set(Math.cos(a) * 62, H, Math.sin(a) * 62);
     grab(kn, 'pan');
   }
@@ -5189,7 +5197,7 @@ function mvDraw() {
     beam.position.set(Math.cos(-tilt) * 23, Math.sin(-tilt) * 23, 0);
     beam.rotation.z = -tilt - Math.PI / 2;
     g.add(beam);
-    const kn = new T.Mesh(new T.SphereGeometry(5.5, 20, 14), basic('#fde68a'));
+    const kn = ball('#fbbf24');
     kn.position.set(Math.cos(-tilt) * 46, Math.sin(-tilt) * 46, 0);
     g.add(kn);
     g.updateMatrixWorld(true);
@@ -5207,8 +5215,8 @@ function mvDraw() {
   const yaw = a + 2.2 + MV.yaw;
   MV.cam.aspect = w / h;
   MV.cam.updateProjectionMatrix();
-  MV.cam.position.set(Math.cos(yaw) * D, cy + 85, Math.sin(yaw) * D);
-  MV.cam.lookAt(0, cy, 0);
+  MV.cam.position.set(Math.cos(yaw) * D, cy + 95, Math.sin(yaw) * D);
+  MV.cam.lookAt(0, cy + 6, 0);
   MV.renderer.render(sc, MV.cam);
   mvHud(it);
 }
